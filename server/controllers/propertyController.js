@@ -39,7 +39,7 @@ const getPropertyById = async (req, res) => {
 
 const createProperty = async (req, res) => {
   try {
-    const { title, description, location, price, amenities, guests, bedrooms, bathrooms } =
+    const { title, description, location, price, amenities, guests, bedrooms, bathrooms, lat, lng } =
       req.body;
 
     const images = req.files?.length
@@ -65,6 +65,8 @@ const createProperty = async (req, res) => {
       guests: Number(guests) || 1,
       bedrooms: Number(bedrooms) || 1,
       bathrooms: Number(bathrooms) || 1,
+      lat: lat ? Number(lat) : 28.6139,
+      lng: lng ? Number(lng) : 77.2090,
     });
 
     res.status(201).json(property);
@@ -84,7 +86,7 @@ const updateProperty = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const { title, description, location, price, amenities, guests, bedrooms, bathrooms } =
+    const { title, description, location, price, amenities, guests, bedrooms, bathrooms, lat, lng } =
       req.body;
 
     if (title) property.title = title;
@@ -97,11 +99,14 @@ const updateProperty = async (req, res) => {
     if (guests) property.guests = Number(guests);
     if (bedrooms) property.bedrooms = Number(bedrooms);
     if (bathrooms) property.bathrooms = Number(bathrooms);
+    if (lat) property.lat = Number(lat);
+    if (lng) property.lng = Number(lng);
     if (amenities) {
       property.amenities = Array.isArray(amenities)
         ? amenities
         : amenities.split(',').map((a) => a.trim());
     }
+
 
     if (req.files?.length) {
       const { getImageUrl } = require('../middleware/uploadMiddleware');

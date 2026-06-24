@@ -15,8 +15,11 @@ const propertySchema = new mongoose.Schema(
     bathrooms: { type: Number, required: true, min: 0, default: 1 },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
+    lat: { type: Number, default: 28.6139 },
+    lng: { type: Number, default: 77.2090 },
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model('Property', propertySchema);
+

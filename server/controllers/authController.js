@@ -28,6 +28,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      wishlist: user.wishlist || [],
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -49,6 +50,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      wishlist: user.wishlist || [],
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -60,4 +62,28 @@ const getMe = async (req, res) => {
   res.json(req.user);
 };
 
-module.exports = { registerUser, loginUser, getMe };
+const toggleWishlist = async (req, res) => {
+  try {
+    const { propertyId } = req.body;
+    if (!propertyId) {
+      return res.status(400).json({ message: 'Property ID required' });
+    }
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const index = user.wishlist.indexOf(propertyId);
+    if (index > -1) {
+      user.wishlist.splice(index, 1);
+    } else {
+      user.wishlist.push(propertyId);
+    }
+    await user.save();
+    res.json(user.wishlist);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getMe, toggleWishlist };
+

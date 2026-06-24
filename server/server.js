@@ -3,13 +3,25 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const Message = require('./models/Message');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
 
 app.use(
   cors({
@@ -25,6 +37,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Airbnb Clone API running' });
@@ -34,15 +47,49 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ message: err.message || 'Server error' });
 });
 
+io.on('connection', (socket) => {
+  socket.on('join_room', (userId) => {
+    if (userId) {
+      socket.join(userId.toString());
+    }
+  });
+
+  socket.on('send_message', async (data) => {
+    const { senderId, receiverId, message } = data;
+    if (!senderId || !receiverId || !message) return;
+
+    try {
+      const savedMessage = await Message.create({
+        senderId,
+        receiverId,
+        message,
+      });
+
+      io.to(receiverId.toString()).emit('receive_message', savedMessage);
+      io.to(senderId.toString()).emit('receive_message', savedMessage);
+
+      io.to(receiverId.toString()).emit('notification', {
+        type: 'message',
+        title: 'New Message',
+        content: message.length > 30 ? message.substring(0, 30) + '...' : message,
+        senderId,
+      });
+    } catch (err) {
+      console.error('Socket message error:', err.message);
+    }
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err.message);
     process.exit(1);
   });
+
