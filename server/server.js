@@ -1,6 +1,18 @@
 require('dotenv').config();
 require('dns').setDefaultResultOrder('ipv4first');
 const path = require('path');
+const fs = require('fs');
+console.log('__dirname:', __dirname);
+try {
+  console.log('Files in ../client:', fs.readdirSync(path.join(__dirname, '../client')));
+} catch (e) {
+  console.error('Error listing ../client:', e.message);
+}
+try {
+  console.log('Files in ../client/dist:', fs.readdirSync(path.join(__dirname, '../client/dist')));
+} catch (e) {
+  console.error('Error listing ../client/dist:', e.message);
+}
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
