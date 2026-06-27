@@ -20,6 +20,22 @@ export default function AddProperty() {
   });
   const [images, setImages] = useState([]);
   const [coords, setCoords] = useState({ lat: 28.6139, lng: 77.2090 });
+  const [leafletReady, setLeafletReady] = useState(!!window.L);
+
+  // Poll for window.L to handle script loading race condition
+  useEffect(() => {
+    if (window.L) {
+      setLeafletReady(true);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (window.L) {
+        setLeafletReady(true);
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,7 +43,15 @@ export default function AddProperty() {
 
   // Map Initialization useEffect
   useEffect(() => {
-    if (!window.L) return;
+    if (!leafletReady || !window.L) return;
+
+    // Fix default Leaflet icon path resolution in Vite
+    delete window.L.Icon.Default.prototype._getIconUrl;
+    window.L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    });
 
     let map;
     try {
@@ -65,7 +89,7 @@ export default function AddProperty() {
         map.remove();
       }
     };
-  }, []);
+  }, [leafletReady]);
 
   // Location Auto-centering useEffect
   useEffect(() => {

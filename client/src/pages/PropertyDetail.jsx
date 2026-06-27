@@ -28,6 +28,22 @@ export default function PropertyDetail() {
 
   // Map reference
   const mapContainerRef = useRef(null);
+  const [leafletReady, setLeafletReady] = useState(!!window.L);
+
+  // Poll for window.L to handle script loading race condition
+  useEffect(() => {
+    if (window.L) {
+      setLeafletReady(true);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (window.L) {
+        setLeafletReady(true);
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +74,15 @@ export default function PropertyDetail() {
 
   // Leaflet Map Initialization
   useEffect(() => {
-    if (!property || !window.L) return;
+    if (!property || !leafletReady || !window.L) return;
+
+    // Fix default Leaflet icon path resolution in Vite
+    delete window.L.Icon.Default.prototype._getIconUrl;
+    window.L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    });
 
     const coords = [property.lat || 28.6139, property.lng || 77.2090];
 
@@ -89,7 +113,7 @@ export default function PropertyDetail() {
         map.remove();
       }
     };
-  }, [property]);
+  }, [property, leafletReady]);
 
   const handleBookingInitiate = async (e) => {
     e.preventDefault();

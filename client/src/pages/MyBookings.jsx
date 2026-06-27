@@ -35,12 +35,18 @@ export default function MyBookings() {
   };
 
   const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Stays that are active today or start in the future
   const upcoming = bookings.filter(
-    (b) => b.status === 'confirmed' && new Date(b.checkIn) >= now
+    (b) => b.status === 'confirmed' && new Date(b.checkOut) >= todayStart
   );
+  
+  // Stays that have ended before today or are marked completed
   const past = bookings.filter(
-    (b) => b.status === 'completed' || (b.status === 'confirmed' && new Date(b.checkOut) < now)
+    (b) => b.status === 'completed' || (b.status === 'confirmed' && new Date(b.checkOut) < todayStart)
   );
+  
   const cancelled = bookings.filter((b) => b.status === 'cancelled');
 
   const BookingTicket = ({ booking }) => {
