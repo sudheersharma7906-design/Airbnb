@@ -90,6 +90,11 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000;
 
+if (!process.env.MONGODB_URI) {
+  console.error('Error: MONGODB_URI environment variable is not defined!');
+  process.exit(1);
+}
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
