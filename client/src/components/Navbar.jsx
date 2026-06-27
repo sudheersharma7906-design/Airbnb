@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { MessageSquare, Heart, Compass, User, LogOut, Bell, LayoutDashboard, PlusCircle, Menu } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { MessageSquare, Heart, Compass, User, LogOut, Bell, LayoutDashboard, PlusCircle, Menu, Sun, Moon } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, notifications, clearNotifications } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -18,7 +20,7 @@ export default function Navbar() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 transition-all duration-200">
+    <nav className="bg-white/80 dark:bg-[#1E1E1E]/80 backdrop-blur-md border-b border-gray-100 dark:border-zinc-800 sticky top-0 z-50 transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Logo */}
@@ -32,8 +34,8 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav Actions */}
-        <div className="flex items-center gap-6">
-          <Link to="/" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] flex items-center gap-1.5 transition">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <Link to="/" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] flex items-center gap-1.5 transition">
             <Compass className="w-4.5 h-4.5" />
             <span>Explore</span>
           </Link>
@@ -41,7 +43,7 @@ export default function Navbar() {
           {user && (
             <>
               {/* Inbox / Chat */}
-              <Link to="/inbox" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] flex items-center gap-1.5 relative transition">
+              <Link to="/inbox" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] flex items-center gap-1.5 relative transition">
                 <MessageSquare className="w-4.5 h-4.5" />
                 <span>Inbox</span>
                 {unreadCount > 0 && (
@@ -52,7 +54,7 @@ export default function Navbar() {
               </Link>
 
               {/* Wishlists */}
-              <Link to="/wishlist" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] flex items-center gap-1.5 transition">
+              <Link to="/wishlist" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] flex items-center gap-1.5 transition">
                 <Heart className="w-4.5 h-4.5" />
                 <span>Wishlists</span>
               </Link>
@@ -60,19 +62,19 @@ export default function Navbar() {
           )}
 
           {user?.role === 'host' ? (
-            <div className="hidden md:flex items-center gap-4 border-l border-gray-200 pl-4">
-              <Link to="/host/dashboard" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] flex items-center gap-1.5 transition">
+            <div className="hidden md:flex items-center gap-4 border-l border-gray-200 dark:border-zinc-800 pl-4">
+              <Link to="/host/dashboard" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] flex items-center gap-1.5 transition">
                 <LayoutDashboard className="w-4.5 h-4.5" />
                 <span>Host Dashboard</span>
               </Link>
-              <Link to="/host/add-property" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] flex items-center gap-1.5 transition">
+              <Link to="/host/add-property" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] flex items-center gap-1.5 transition">
                 <PlusCircle className="w-4.5 h-4.5" />
                 <span>Add Property</span>
               </Link>
             </div>
           ) : (
             user && (
-              <Link to="/bookings" className="text-sm font-semibold text-gray-700 hover:text-[#FF385C] transition">
+              <Link to="/bookings" className="text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:text-[#FF385C] dark:hover:text-[#FF385C] transition">
                 My Trips
               </Link>
             )
@@ -86,7 +88,7 @@ export default function Navbar() {
                   setShowNotifications(!showNotifications);
                   if (!showNotifications) clearNotifications();
                 }}
-                className="text-gray-600 hover:text-gray-900 p-1.5 hover:bg-gray-50 rounded-full transition relative"
+                className="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white p-1.5 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition relative cursor-pointer"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
@@ -95,16 +97,16 @@ export default function Navbar() {
               </button>
 
               {showNotifications && (
-                <div className="absolute right-0 mt-3 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl py-3 z-50 animate-fade-in">
-                  <h3 className="px-4 font-bold text-gray-900 text-sm mb-2">Notifications</h3>
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1E1E1E] border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-xl py-3 z-50 animate-fade-in">
+                  <h3 className="px-4 font-bold text-gray-900 dark:text-white text-sm mb-2">Notifications</h3>
                   <div className="max-h-60 overflow-y-auto px-2">
                     {notifications.length === 0 ? (
                       <p className="text-center py-6 text-xs text-gray-400">No new notifications</p>
                     ) : (
                       notifications.map(n => (
-                        <div key={n.id} className="p-2 hover:bg-gray-50 rounded-xl transition text-left text-xs mb-1">
-                          <p className="font-semibold text-gray-900">{n.title}</p>
-                          <p className="text-gray-500 mt-0.5">{n.content}</p>
+                        <div key={n.id} className="p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-xl transition text-left text-xs mb-1">
+                          <p className="font-semibold text-gray-900 dark:text-white">{n.title}</p>
+                          <p className="text-gray-500 dark:text-zinc-400 mt-0.5">{n.content}</p>
                         </div>
                       ))
                     )}
@@ -114,11 +116,24 @@ export default function Navbar() {
             </div>
           )}
 
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition duration-300 ease-in-out cursor-pointer"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4.5 h-4.5 text-amber-500 transition-transform duration-300 hover:rotate-45" />
+            ) : (
+              <Moon className="w-4.5 h-4.5 text-gray-600 transition-transform duration-300 hover:-rotate-12" />
+            )}
+          </button>
+
           {/* User Menu Trigger */}
           <div className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2.5 border border-gray-200 rounded-full p-2 pl-3 hover:shadow-md transition cursor-pointer"
+              className="flex items-center gap-2.5 border border-gray-200 dark:border-zinc-800 rounded-full p-2 pl-3 hover:shadow-md transition cursor-pointer text-gray-700 dark:text-zinc-300 bg-white dark:bg-[#1E1E1E]"
             >
               <Menu className="w-4 h-4 text-gray-500" />
               <div className="w-7 h-7 bg-[#FF385C] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-inner">
@@ -127,12 +142,12 @@ export default function Navbar() {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 animate-fade-in text-left">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1E1E1E] border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-xl py-2 z-50 animate-fade-in text-left">
                 {user ? (
                   <>
-                    <div className="px-4 py-2 border-b border-gray-100 mb-1">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-850 mb-1">
                       <p className="text-xs text-gray-400">Logged in as</p>
-                      <p className="font-bold text-gray-800 truncate text-sm">{user.name}</p>
+                      <p className="font-bold text-gray-800 dark:text-white truncate text-sm">{user.name}</p>
                       <span className="inline-block mt-0.5 bg-[#FF385C]/10 text-[#FF385C] text-[10px] font-semibold px-2 py-0.5 rounded-full">
                         {user.role.toUpperCase()}
                       </span>
@@ -141,49 +156,49 @@ export default function Navbar() {
                     <Link 
                       to="/bookings" 
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 font-medium"
                     >
                       My Trips
                     </Link>
                     <Link 
                       to="/wishlist" 
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 font-medium"
                     >
                       Wishlists
                     </Link>
                     <Link 
                       to="/inbox" 
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 font-medium"
                     >
                       Inbox messages
                     </Link>
 
                     {user.role === 'host' && (
                       <>
-                        <div className="border-t border-gray-100 my-1"></div>
+                        <div className="border-t border-gray-100 dark:border-zinc-850 my-1"></div>
                         <Link 
                           to="/host/dashboard" 
                           onClick={() => setDropdownOpen(false)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 font-medium"
                         >
                           Host Dashboard
                         </Link>
                         <Link 
                           to="/host/add-property" 
                           onClick={() => setDropdownOpen(false)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 font-medium"
                         >
                           List a property
                         </Link>
                       </>
                     )}
 
-                    <div className="border-t border-gray-100 my-1"></div>
+                    <div className="border-t border-gray-100 dark:border-zinc-850 my-1"></div>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50/50 flex items-center gap-1.5 font-semibold"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50/50 dark:hover:bg-red-950/20 flex items-center gap-1.5 font-semibold cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Logout
@@ -194,14 +209,14 @@ export default function Navbar() {
                     <Link
                       to="/login"
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2.5 text-sm text-gray-900 font-bold hover:bg-gray-50"
+                      className="block px-4 py-2.5 text-sm text-gray-900 dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                     >
                       Log in
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2.5 text-sm text-[#FF385C] font-bold hover:bg-gray-50"
+                      className="block px-4 py-2.5 text-sm text-[#FF385C] font-bold hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                     >
                       Sign up
                     </Link>

@@ -55,6 +55,13 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const signupOTP = async (payload) => {
+    const { data } = await api.post('/auth/signup', payload);
+    localStorage.setItem('airbnb_user', JSON.stringify(data));
+    setUser(data);
+    return data;
+  };
+
   const logout = () => {
     localStorage.removeItem('airbnb_user');
     setUser(null);
@@ -77,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, toggleWishlist, socket, notifications, clearNotifications }}>
+    <AuthContext.Provider value={{ user, loading, login, register, signupOTP, logout, toggleWishlist, socket, notifications, clearNotifications }}>
       {children}
     </AuthContext.Provider>
   );

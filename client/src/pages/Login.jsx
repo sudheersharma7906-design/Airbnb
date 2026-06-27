@@ -66,9 +66,17 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Password
-              </label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <Lock className="w-3 h-3" /> Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-[10px] font-bold text-[#FF385C] hover:underline focus:outline-none"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 type="password"
                 required

@@ -5,6 +5,10 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyOTP from './pages/VerifyOTP';
+import ResetPassword from './pages/ResetPassword';
+import VerifySignupOTP from './pages/VerifySignupOTP';
 import PropertyDetail from './pages/PropertyDetail';
 import AddProperty from './pages/AddProperty';
 import EditProperty from './pages/EditProperty';
@@ -32,6 +36,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/verify-signup-otp" element={<VerifySignupOTP />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/properties/:id" element={<PropertyDetail />} />
 
           <Route

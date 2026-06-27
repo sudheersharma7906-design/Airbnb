@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #222222;
   background-color: #fcfcfc;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #121212;
+  color: #f5f5f5;
 }
 
 /* Custom premium scrollbar */
@@ -37,5 +45,126 @@ body {
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease forwards;
+}
+
+/* Global Dark Mode Overrides */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #121212 !important;
+  color: #f5f5f5 !important;
+}
+
+/* Background overrides */
+.dark .bg-\[\#FCFCFC\],
+.dark div.bg-\[\#FCFCFC\] {
+  background-color: #121212 !important;
+}
+
+.dark .bg-white,
+.dark div.bg-white,
+.dark section.bg-white,
+.dark header.bg-white,
+.dark form.bg-white,
+.dark .bg-white\/80 {
+  background-color: #1e1e1e !important;
+}
+
+/* Text overrides */
+.dark .text-gray-900,
+.dark h1.text-gray-900,
+.dark h2.text-gray-900,
+.dark h3.text-gray-900,
+.dark span.text-gray-900 {
+  color: #ffffff !important;
+}
+
+.dark .text-gray-800,
+.dark h2.text-gray-800 {
+  color: #f4f4f5 !important;
+}
+
+.dark .text-gray-700 {
+  color: #e4e4e7 !important;
+}
+
+.dark .text-gray-650 {
+  color: #d4d4d8 !important;
+}
+
+.dark .text-gray-600 {
+  color: #c4c4c7 !important;
+}
+
+.dark .text-gray-555 {
+  color: #b4b4b8 !important;
+}
+
+.dark .text-gray-500 {
+  color: #a1a1aa !important;
+}
+
+.dark .text-gray-400 {
+  color: #71717a !important;
+}
+
+/* Borders */
+.dark .border-gray-100,
+.dark .border-gray-150,
+.dark .border-gray-200,
+.dark .border-gray-250 {
+  border-color: #27272a !important;
+}
+
+/* Gray Backgrounds */
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #27272a !important;
+}
+
+/* Hovers */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #27272a !important;
+}
+
+.dark .hover\:shadow-md:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+}
+
+/* Inputs, Selects & Textareas */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+  border-color: #3f3f46 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a !important;
+}
+
+/* Focus and border defaults */
+.dark .border-gray-900 {
+  border-color: #ffffff !important;
+}
+
+/* Premium Dark Mode Map Filter */
+.dark .leaflet-container {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) !important;
+}
+
+/* Dark Mode Scrollbars */
+.dark ::-webkit-scrollbar-track {
+  background: #121212 !important;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a !important;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46 !important;
 }
 
