@@ -43,6 +43,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Airbnb Clone API running' });
 });
 
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+}
+
 app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ message: err.message || 'Server error' });
 });
