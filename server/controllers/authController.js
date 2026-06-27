@@ -292,15 +292,21 @@ const sendSignupOTP = async (req, res) => {
 
     // Generate secure random 6-digit email OTP
     const emailOtp = crypto.randomInt(100000, 999999).toString();
-    const emailHashedOtp = await bcrypt.hash(emailOtp, 10);
 
     // Generate secure random 6-digit mobile OTP if mobile is provided
     let mobileOtp;
-    let mobileHashedOtp;
     if (formattedMobile) {
       mobileOtp = crypto.randomInt(100000, 999999).toString();
-      mobileHashedOtp = await bcrypt.hash(mobileOtp, 10);
     }
+
+    // Hash OTPs in parallel
+    const hashPromises = [bcrypt.hash(emailOtp, 10)];
+    if (formattedMobile) {
+      hashPromises.push(bcrypt.hash(mobileOtp, 10));
+    }
+    const hashes = await Promise.all(hashPromises);
+    const emailHashedOtp = hashes[0];
+    const mobileHashedOtp = formattedMobile ? hashes[1] : undefined;
 
     // Save/Overwrite OTP in DB
     await Otp.deleteOne({ email: normalizedEmail });
@@ -315,15 +321,17 @@ const sendSignupOTP = async (req, res) => {
       verified: false
     });
 
-    // Send email OTP
-    const emailSent = await sendSignupOTPEmail(normalizedEmail, emailOtp);
-    if (!emailSent) {
-      return res.status(500).json({ message: 'Failed to send verification email. Please try again later.' });
+    // Send email and mobile OTP in parallel
+    const sendPromises = [sendSignupOTPEmail(normalizedEmail, emailOtp)];
+    if (formattedMobile) {
+      sendPromises.push(sendSignupOTPSMS(formattedMobile, mobileOtp));
     }
 
-    // Send mobile OTP
-    if (formattedMobile) {
-      await sendSignupOTPSMS(formattedMobile, mobileOtp);
+    const sendResults = await Promise.all(sendPromises);
+    const emailSent = sendResults[0];
+
+    if (!emailSent) {
+      return res.status(500).json({ message: 'Failed to send verification email. Please try again later.' });
     }
 
     res.json({ message: 'Verification OTP sent successfully' });
@@ -414,15 +422,21 @@ const resendSignupOTP = async (req, res) => {
 
     // Generate new email OTP
     const emailOtp = crypto.randomInt(100000, 999999).toString();
-    const emailHashedOtp = await bcrypt.hash(emailOtp, 10);
 
     // Generate new mobile OTP if mobile was provided
     let mobileOtp;
-    let mobileHashedOtp;
     if (otpRecord.mobile) {
       mobileOtp = crypto.randomInt(100000, 999999).toString();
-      mobileHashedOtp = await bcrypt.hash(mobileOtp, 10);
     }
+
+    // Hash OTPs in parallel
+    const hashPromises = [bcrypt.hash(emailOtp, 10)];
+    if (otpRecord.mobile) {
+      hashPromises.push(bcrypt.hash(mobileOtp, 10));
+    }
+    const hashes = await Promise.all(hashPromises);
+    const emailHashedOtp = hashes[0];
+    const mobileHashedOtp = otpRecord.mobile ? hashes[1] : undefined;
 
     otpRecord.emailHashedOtp = emailHashedOtp;
     if (otpRecord.mobile) {
@@ -434,11 +448,12 @@ const resendSignupOTP = async (req, res) => {
     otpRecord.verified = false;
     await otpRecord.save();
 
-    // Send new OTPs
-    await sendSignupOTPEmail(otpRecord.email, emailOtp);
+    // Send email and mobile OTP in parallel
+    const sendPromises = [sendSignupOTPEmail(otpRecord.email, emailOtp)];
     if (otpRecord.mobile) {
-      await sendSignupOTPSMS(otpRecord.mobile, mobileOtp);
+      sendPromises.push(sendSignupOTPSMS(otpRecord.mobile, mobileOtp));
     }
+    await Promise.all(sendPromises);
 
     res.json({ message: 'A new OTP has been sent.' });
   } catch (error) {
