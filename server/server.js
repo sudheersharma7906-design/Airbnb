@@ -15,6 +15,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const Message = require('./models/Message');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
