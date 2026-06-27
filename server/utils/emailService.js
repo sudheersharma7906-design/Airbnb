@@ -1,13 +1,27 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const sendEmail = async ({ to, subject, html }) => {
+  const useResend = !!process.env.RESEND_API_KEY;
   const useGmail = !!(process.env.EMAIL && process.env.EMAIL_PASSWORD);
   try {
-    let transporter;
-
-    if (useGmail) {
+    if (useResend) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+      const { data, error } = await resend.emails.send({
+        from: fromEmail,
+        to,
+        subject,
+        html,
+      });
+      if (error) {
+        throw new Error(error.message);
+      }
+      console.log(`[EMAIL] Sent successfully via Resend API to ${to}, ID: ${data.id}`);
+      return true;
+    } else if (useGmail) {
       const dns = require('dns');
-      transporter = nodemailer.createTransport({
+      const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
