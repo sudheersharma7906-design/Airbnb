@@ -2,25 +2,52 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import { Sparkles, Mail, Lock } from 'lucide-react';
+import { Sparkles, Phone, ShieldCheck } from 'lucide-react';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { sendLoginOTP, verifyLoginOTP } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault();
     setError('');
+    setMessage('');
+    if (!mobile) {
+      setError('Please enter a valid mobile number');
+      return;
+    }
     setLoading(true);
     try {
-      await login(email, password);
+      const res = await sendLoginOTP(mobile);
+      setOtpSent(true);
+      setMessage(res.message || 'OTP sent successfully to your mobile number');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send OTP. Make sure the number is registered.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    if (otp.trim().length !== 6) {
+      setError('Please enter a valid 6-digit OTP code');
+      return;
+    }
+    setLoading(true);
+    try {
+      await verifyLoginOTP(mobile, otp);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+      setError(err.response?.data?.message || 'Invalid or expired OTP. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,51 +77,86 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Mail className="w-3 h-3" /> Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="guest@example.com"
-                className="w-full border border-gray-250 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent"
-              />
+          {message && !error && (
+            <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs p-3.5 rounded-xl font-semibold text-center">
+              {message}
             </div>
+          )}
 
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                  <Lock className="w-3 h-3" /> Password
+          {!otpSent ? (
+            <form onSubmit={handleSendOTP} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Phone className="w-3.5 h-3.5" /> Mobile Number
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-[10px] font-bold text-[#FF385C] hover:underline focus:outline-none"
-                >
-                  Forgot password?
-                </Link>
+                <input
+                  type="text"
+                  required
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  placeholder="+919876543210"
+                  className="w-full border border-gray-250 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent"
+                />
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full border border-gray-250 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent"
-              />
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3 rounded-xl shadow-md transition hover:scale-101 active:scale-99 cursor-pointer text-sm mt-2"
-            >
-              {loading ? 'Logging in...' : 'Log In'}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3 rounded-xl shadow-md transition hover:scale-101 active:scale-99 cursor-pointer text-sm mt-2"
+              >
+                {loading ? 'Sending OTP...' : 'Send OTP'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOTP} className="space-y-4">
+              <div className="text-center pb-2">
+                <p className="text-xs text-gray-500 font-medium">
+                  We sent a code to <span className="font-extrabold text-gray-800">{mobile}</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setOtpSent(false)}
+                  className="text-[10px] text-[#FF385C] hover:underline font-extrabold bg-transparent border-none cursor-pointer mt-1"
+                >
+                  Change Mobile Number
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" /> Verification Code
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  placeholder="6-digit OTP"
+                  className="w-full border border-gray-250 rounded-xl px-4 py-2.5 text-sm tracking-widest text-center font-extrabold focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3 rounded-xl shadow-md transition hover:scale-101 active:scale-99 cursor-pointer text-sm mt-2"
+              >
+                {loading ? 'Verifying...' : 'Verify & Log In'}
+              </button>
+              
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleSendOTP}
+                  disabled={loading}
+                  className="text-xs text-gray-500 hover:text-[#FF385C] font-bold bg-transparent border-none cursor-pointer"
+                >
+                  Resend OTP Code
+                </button>
+              </div>
+            </form>
+          )}
 
           <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-50">
             Don't have an account?{' '}

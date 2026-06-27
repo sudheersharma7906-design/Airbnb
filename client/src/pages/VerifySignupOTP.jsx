@@ -9,12 +9,10 @@ export default function VerifySignupOTP() {
   const navigate = useNavigate();
   const location = useLocation();
   const signupData = location.state?.signupData;
-  const email = signupData?.email;
   const mobile = signupData?.mobile;
 
   const { signupOTP } = useAuth();
 
-  const [emailOtpDigits, setEmailOtpDigits] = useState(['', '', '', '', '', '']);
   const [mobileOtpDigits, setMobileOtpDigits] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -28,15 +26,14 @@ export default function VerifySignupOTP() {
   const [resendTimer, setResendTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  const emailInputRefs = useRef([]);
   const mobileInputRefs = useRef([]);
 
   // Redirect to register if signupData is missing
   useEffect(() => {
-    if (!signupData || !email) {
+    if (!signupData || !mobile) {
       navigate('/register');
     }
-  }, [signupData, email, navigate]);
+  }, [signupData, mobile, navigate]);
 
   // Main countdown clock
   useEffect(() => {
@@ -77,53 +74,32 @@ export default function VerifySignupOTP() {
     return () => clearInterval(interval);
   }, [success, successTimer, navigate, signupData]);
 
-  const handleChange = (type, index, value) => {
+  const handleChange = (index, value) => {
     if (value !== '' && !/^[0-9]$/.test(value)) return;
 
-    if (type === 'email') {
-      const newOtp = [...emailOtpDigits];
-      newOtp[index] = value;
-      setEmailOtpDigits(newOtp);
+    const newOtp = [...mobileOtpDigits];
+    newOtp[index] = value;
+    setMobileOtpDigits(newOtp);
 
-      // Auto-focus next input
-      if (value !== '' && index < 5) {
-        emailInputRefs.current[index + 1]?.focus();
-      }
-    } else {
-      const newOtp = [...mobileOtpDigits];
-      newOtp[index] = value;
-      setMobileOtpDigits(newOtp);
-
-      // Auto-focus next input
-      if (value !== '' && index < 5) {
-        mobileInputRefs.current[index + 1]?.focus();
-      }
+    // Auto-focus next input
+    if (value !== '' && index < 5) {
+      mobileInputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyDown = (type, index, e) => {
+  const handleKeyDown = (index, e) => {
     if (e.key === 'Backspace') {
-      if (type === 'email') {
-        if (emailOtpDigits[index] === '' && index > 0) {
-          emailInputRefs.current[index - 1]?.focus();
-        } else {
-          const newOtp = [...emailOtpDigits];
-          newOtp[index] = '';
-          setEmailOtpDigits(newOtp);
-        }
+      if (mobileOtpDigits[index] === '' && index > 0) {
+        mobileInputRefs.current[index - 1]?.focus();
       } else {
-        if (mobileOtpDigits[index] === '' && index > 0) {
-          mobileInputRefs.current[index - 1]?.focus();
-        } else {
-          const newOtp = [...mobileOtpDigits];
-          newOtp[index] = '';
-          setMobileOtpDigits(newOtp);
-        }
+        const newOtp = [...mobileOtpDigits];
+        newOtp[index] = '';
+        setMobileOtpDigits(newOtp);
       }
     }
   };
 
-  const handlePaste = (type, e) => {
+  const handlePaste = (e) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData('text').trim();
     if (!/^\d{6}$/.test(pasteData)) {
@@ -132,13 +108,8 @@ export default function VerifySignupOTP() {
     }
 
     const digits = pasteData.split('');
-    if (type === 'email') {
-      setEmailOtpDigits(digits);
-      emailInputRefs.current[5]?.focus();
-    } else {
-      setMobileOtpDigits(digits);
-      mobileInputRefs.current[5]?.focus();
-    }
+    setMobileOtpDigits(digits);
+    mobileInputRefs.current[5]?.focus();
   };
 
   const handleVerifyOTP = async (e) => {
@@ -146,15 +117,9 @@ export default function VerifySignupOTP() {
     setError('');
     setMessage('');
 
-    const emailOtp = emailOtpDigits.join('');
     const mobileOtp = mobileOtpDigits.join('');
 
-    if (emailOtp.length !== 6) {
-      setError('Please enter a complete 6-digit Email OTP code');
-      return;
-    }
-
-    if (mobile && mobileOtp.length !== 6) {
+    if (mobileOtp.length !== 6) {
       setError('Please enter a complete 6-digit Mobile OTP code');
       return;
     }
@@ -163,9 +128,8 @@ export default function VerifySignupOTP() {
     try {
       // Step 1: Verify OTP codes
       await api.post('/auth/verify-signup-otp', {
-        email,
-        emailOtp,
-        mobileOtp: mobile ? mobileOtp : undefined
+        mobile,
+        mobileOtp
       });
 
       // Step 2: Proceed with account creation (signup) and auto login
@@ -188,14 +152,13 @@ export default function VerifySignupOTP() {
     setMessage('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/resend-signup-otp', { email });
+      const res = await api.post('/auth/resend-signup-otp', { mobile });
       setMessage(res.data.message || 'A new OTP has been sent.');
       setTimer(300); // reset 5 minutes
       setResendTimer(60); // reset 60 seconds resend lock
       setCanResend(false);
-      setEmailOtpDigits(['', '', '', '', '', '']);
       setMobileOtpDigits(['', '', '', '', '', '']);
-      emailInputRefs.current[0]?.focus();
+      mobileInputRefs.current[0]?.focus();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend OTP.');
     } finally {
@@ -228,8 +191,7 @@ export default function VerifySignupOTP() {
                   Verify Your Account
                 </h2>
                 <p className="text-xs text-gray-400 dark:text-zinc-500 font-medium px-4">
-                  We've sent a 6-digit OTP verification code to <span className="font-semibold text-gray-650 dark:text-zinc-300">{email}</span>
-                  {mobile && <span> and your phone <span className="font-semibold text-gray-650 dark:text-zinc-300">{mobile}</span></span>}
+                  We've sent a 6-digit OTP verification code to your phone <span className="font-semibold text-gray-655 dark:text-zinc-300">{mobile}</span>
                 </p>
               </div>
 
@@ -248,47 +210,24 @@ export default function VerifySignupOTP() {
               <form onSubmit={handleVerifyOTP} className="space-y-6">
                 <div className="space-y-2">
                   <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider text-center flex justify-center items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Email Verification Code
+                    <ShieldCheck className="w-3.5 h-3.5" /> Mobile Verification Code
                   </label>
 
-                  <div className="flex justify-between gap-2 px-2" onPaste={(e) => handlePaste('email', e)}>
-                    {emailOtpDigits.map((digit, index) => (
+                  <div className="flex justify-between gap-2 px-2" onPaste={handlePaste}>
+                    {mobileOtpDigits.map((digit, index) => (
                       <input
-                        key={`email-${index}`}
+                        key={`mobile-${index}`}
                         type="text"
                         maxLength={1}
                         value={digit}
-                        ref={(el) => (emailInputRefs.current[index] = el)}
-                        onChange={(e) => handleChange('email', index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown('email', index, e)}
+                        ref={(el) => (mobileInputRefs.current[index] = el)}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
                         className="w-12 h-14 border border-gray-250 dark:border-zinc-700 rounded-xl text-center text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-[#FF385C] focus:border-transparent bg-transparent text-gray-900 dark:text-white"
                       />
                     ))}
                   </div>
                 </div>
-
-                {mobile && (
-                  <div className="space-y-2 mt-4">
-                    <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider text-center flex justify-center items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5" /> Mobile Verification Code
-                    </label>
-
-                    <div className="flex justify-between gap-2 px-2" onPaste={(e) => handlePaste('mobile', e)}>
-                      {mobileOtpDigits.map((digit, index) => (
-                        <input
-                          key={`mobile-${index}`}
-                          type="text"
-                          maxLength={1}
-                          value={digit}
-                          ref={(el) => (mobileInputRefs.current[index] = el)}
-                          onChange={(e) => handleChange('mobile', index, e.target.value)}
-                          onKeyDown={(e) => handleKeyDown('mobile', index, e)}
-                          className="w-12 h-14 border border-gray-250 dark:border-zinc-700 rounded-xl text-center text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-[#FF385C] focus:border-transparent bg-transparent text-gray-900 dark:text-white"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 <div className="text-center font-medium">
                   {timer > 0 ? (
@@ -304,7 +243,7 @@ export default function VerifySignupOTP() {
 
                 <button
                   type="submit"
-                  disabled={loading || emailOtpDigits.some(d => d === '') || (mobile && mobileOtpDigits.some(d => d === ''))}
+                  disabled={loading || mobileOtpDigits.some(d => d === '')}
                   className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3 rounded-xl shadow-md transition hover:scale-101 active:scale-99 cursor-pointer text-sm flex justify-center items-center gap-2"
                 >
                   {loading ? (
@@ -342,7 +281,7 @@ export default function VerifySignupOTP() {
                       onClick={() => navigate('/register')}
                       className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#FF385C] transition font-bold focus:outline-none bg-transparent"
                     >
-                      <ArrowLeft className="w-3.5 h-3.5" /> Change Email/Mobile
+                      <ArrowLeft className="w-3.5 h-3.5" /> Change Mobile Number
                     </button>
                   </div>
                 </div>

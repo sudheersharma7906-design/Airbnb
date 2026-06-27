@@ -2,6 +2,10 @@ const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
 
 const sendEmail = async ({ to, subject, html }) => {
+  if (!to) {
+    console.log('[EMAIL] No recipient email provided. Skipping email dispatch.');
+    return true;
+  }
   const useResend = !!process.env.RESEND_API_KEY;
   const useGmail = !!(process.env.EMAIL && process.env.EMAIL_PASSWORD);
   try {

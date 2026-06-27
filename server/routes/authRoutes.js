@@ -13,7 +13,9 @@ const {
   sendSignupOTP,
   verifySignupOTP,
   resendSignupOTP,
-  signup
+  signup,
+  sendLoginOTP,
+  verifyLoginOTP
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -45,6 +47,13 @@ const emailValidation = [
     .notEmpty().withMessage('Email address is required')
     .isEmail().withMessage('Please enter a valid email address')
     .normalizeEmail(),
+  validateRequest
+];
+
+const mobileValidation = [
+  body('mobile')
+    .trim()
+    .notEmpty().withMessage('Mobile number is required'),
   validateRequest
 ];
 
@@ -91,25 +100,25 @@ const signupOTPValidation = [
     .trim()
     .notEmpty().withMessage('Full Name is required'),
   body('email')
+    .optional({ checkFalsy: true })
     .trim()
-    .notEmpty().withMessage('Email address is required')
     .isEmail().withMessage('Please enter a valid email address')
     .normalizeEmail(),
   body('mobile')
-    .optional({ checkFalsy: true })
     .trim()
+    .notEmpty().withMessage('Mobile number is required')
     .matches(/^\+?[1-9]\d{1,14}$/).withMessage('Please enter a valid mobile number in E.164 format (e.g. +1234567890)'),
   body('password')
-    .notEmpty().withMessage('Password is required')
+    .optional({ checkFalsy: true })
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
     .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
     .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
     .matches(/[0-9]/).withMessage('Password must contain at least one number')
     .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
   body('confirmPassword')
-    .notEmpty().withMessage('Confirm password is required')
+    .optional({ checkFalsy: true })
     .custom((value, { req }) => {
-      if (value !== req.body.password) {
+      if (value && value !== req.body.password) {
         throw new Error('Passwords do not match');
       }
       return true;
@@ -122,19 +131,12 @@ const signupOTPValidation = [
 ];
 
 const verifySignupOtpValidation = [
-  body('email')
+  body('mobile')
     .trim()
-    .notEmpty().withMessage('Email address is required')
-    .isEmail().withMessage('Please enter a valid email address')
-    .normalizeEmail(),
-  body('emailOtp')
-    .trim()
-    .notEmpty().withMessage('Email OTP is required')
-    .isNumeric().withMessage('Email OTP must contain only numbers')
-    .isLength({ min: 6, max: 6 }).withMessage('Email OTP must be exactly 6 digits'),
+    .notEmpty().withMessage('Mobile number is required'),
   body('mobileOtp')
-    .optional({ checkFalsy: true })
     .trim()
+    .notEmpty().withMessage('Mobile OTP is required')
     .isNumeric().withMessage('Mobile OTP must contain only numbers')
     .isLength({ min: 6, max: 6 }).withMessage('Mobile OTP must be exactly 6 digits'),
   validateRequest
@@ -145,13 +147,35 @@ const finalSignupValidation = [
   validateRequest
 ];
 
+const sendLoginOtpValidation = [
+  body('mobile')
+    .trim()
+    .notEmpty().withMessage('Mobile number is required')
+    .matches(/^\+?[1-9]\d{1,14}$/).withMessage('Please enter a valid mobile number (e.g. +919876543210)'),
+  validateRequest
+];
+
+const verifyLoginOtpValidation = [
+  body('mobile')
+    .trim()
+    .notEmpty().withMessage('Mobile number is required'),
+  body('otp')
+    .trim()
+    .notEmpty().withMessage('OTP is required')
+    .isNumeric().withMessage('OTP must contain only numbers')
+    .isLength({ min: 6, max: 6 }).withMessage('OTP must be exactly 6 digits'),
+  validateRequest
+];
+
 // Auth routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+router.post('/send-login-otp', recoveryLimiter, sendLoginOtpValidation, sendLoginOTP);
+router.post('/verify-login-otp', recoveryLimiter, verifyLoginOtpValidation, verifyLoginOTP);
 router.get('/me', protect, getMe);
 router.post('/wishlist', protect, toggleWishlist);
 
-// Password recovery routes
+// Password recovery routes (deprecated / kept for email backup)
 router.post('/forgot-password', recoveryLimiter, emailValidation, forgotPassword);
 router.post('/verify-otp', recoveryLimiter, verifyOtpValidation, verifyOTP);
 router.post('/resend-otp', recoveryLimiter, emailValidation, resendOTP);
@@ -160,7 +184,7 @@ router.post('/reset-password', recoveryLimiter, resetPasswordValidation, resetPa
 // Signup with OTP routes
 router.post('/send-signup-otp', recoveryLimiter, signupOTPValidation, sendSignupOTP);
 router.post('/verify-signup-otp', recoveryLimiter, verifySignupOtpValidation, verifySignupOTP);
-router.post('/resend-signup-otp', recoveryLimiter, emailValidation, resendSignupOTP);
+router.post('/resend-signup-otp', recoveryLimiter, mobileValidation, resendSignupOTP);
 router.post('/signup', recoveryLimiter, finalSignupValidation, signup);
 
 module.exports = router;

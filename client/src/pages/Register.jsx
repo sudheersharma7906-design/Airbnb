@@ -45,7 +45,7 @@ export default function Register() {
     setError('');
 
     // Field Validations
-    if (!fullName || !email || !password || !role) {
+    if (!fullName || !mobile || !password || !role) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -68,7 +68,7 @@ export default function Register() {
     }
 
     // Mobile format check (E.164 format: e.g. +919876543210 or 9876543210)
-    if (mobile && !/^\+?[1-9]\d{1,14}$/.test(mobile.trim())) {
+    if (!/^\+?[1-9]\d{1,14}$/.test(mobile.trim())) {
       setError('Please enter a valid mobile number (e.g. +919876543210 or 9876543210).');
       return;
     }
@@ -78,8 +78,8 @@ export default function Register() {
       const payload = {
         fullName: fullName.trim(),
         username: username.trim() || undefined,
-        email: email.trim(),
-        mobile: mobile.trim() || undefined,
+        email: email.trim() || undefined,
+        mobile: mobile.trim(),
         password,
         confirmPassword,
         role,
@@ -98,7 +98,7 @@ export default function Register() {
   };
 
   const isPasswordValid = Object.values(passwordRules).every(Boolean);
-  const isFormValid = fullName && email && isPasswordValid && password === confirmPassword && acceptTerms;
+  const isFormValid = fullName && mobile && isPasswordValid && password === confirmPassword && acceptTerms;
 
   return (
     <div className="min-h-screen bg-[#FCFCFC] dark:bg-[#121212] flex flex-col transition-colors duration-300">
@@ -153,28 +153,14 @@ export default function Register() {
               />
             </div>
 
-            {/* Email Address */}
-            <div>
-              <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Mail className="w-3 h-3" /> Email Address *
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="sudheer@example.com"
-                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
-              />
-            </div>
-
             {/* Mobile Number */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Phone className="w-3 h-3" /> Mobile Number <span className="text-[9px] text-gray-300 dark:text-zinc-600">(For SMS OTP)</span>
+                <Phone className="w-3 h-3" /> Mobile Number *
               </label>
               <input
                 type="text"
+                required
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 placeholder="+919876543210"

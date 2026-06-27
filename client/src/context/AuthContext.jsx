@@ -48,6 +48,18 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const sendLoginOTP = async (mobile) => {
+    const { data } = await api.post('/auth/send-login-otp', { mobile });
+    return data;
+  };
+
+  const verifyLoginOTP = async (mobile, otp) => {
+    const { data } = await api.post('/auth/verify-login-otp', { mobile, otp });
+    localStorage.setItem('airbnb_user', JSON.stringify(data));
+    setUser(data);
+    return data;
+  };
+
   const register = async (name, email, password, role = 'user') => {
     const { data } = await api.post('/auth/register', { name, email, password, role });
     localStorage.setItem('airbnb_user', JSON.stringify(data));
@@ -84,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, signupOTP, logout, toggleWishlist, socket, notifications, clearNotifications }}>
+    <AuthContext.Provider value={{ user, loading, login, register, signupOTP, logout, toggleWishlist, socket, notifications, clearNotifications, sendLoginOTP, verifyLoginOTP }}>
       {children}
     </AuthContext.Provider>
   );
