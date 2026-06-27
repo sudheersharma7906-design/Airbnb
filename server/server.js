@@ -28,6 +28,10 @@ const Message = require('./models/Message');
 
 const app = express();
 app.set('trust proxy', 1);
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - NODE_ENV=${process.env.NODE_ENV}`);
+  next();
+});
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
