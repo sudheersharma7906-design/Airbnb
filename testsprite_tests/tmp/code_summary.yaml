@@ -1,0 +1,176 @@
+version: "2"
+type: frontend
+tech_stack:
+  - Javascript
+  - React
+  - Tailwind CSS v4
+  - Vite
+  - React Router DOM
+  - Socket.io-client
+  - Lucide React
+  - Axios
+routes:
+  - path: /
+    file: client/src/pages/Home.jsx
+    auth_required: false
+    description: Home page with search filters and listing categories
+  - path: /login
+    file: client/src/pages/Login.jsx
+    auth_required: false
+    description: Login page
+  - path: /register
+    file: client/src/pages/Register.jsx
+    auth_required: false
+    description: Registration page with multi-step flow
+  - path: /forgot-password
+    file: client/src/pages/ForgotPassword.jsx
+    auth_required: false
+    description: Forgot password OTP request page
+  - path: /verify-otp
+    file: client/src/pages/VerifyOTP.jsx
+    auth_required: false
+    description: OTP verification page for password reset
+  - path: /verify-signup-otp
+    file: client/src/pages/VerifySignupOTP.jsx
+    auth_required: false
+    description: OTP verification page for registration signup
+  - path: /reset-password
+    file: client/src/pages/ResetPassword.jsx
+    auth_required: false
+    description: Reset password page
+  - path: /properties/:id
+    file: client/src/pages/PropertyDetail.jsx
+    auth_required: false
+    description: Property details with reviews, mapping, and booking
+  - path: /bookings
+    file: client/src/pages/MyBookings.jsx
+    auth_required: true
+    description: Traveler booking history
+  - path: /wishlist
+    file: client/src/pages/Wishlist.jsx
+    auth_required: true
+    description: Saved properties list
+  - path: /inbox
+    file: client/src/pages/Inbox.jsx
+    auth_required: true
+    description: Direct messaging with hosts
+  - path: /host/dashboard
+    file: client/src/pages/HostDashboard.jsx
+    auth_required: true
+    description: Metrics, list of hosted properties, and bookings overview
+  - path: /host/add-property
+    file: client/src/pages/AddProperty.jsx
+    auth_required: true
+    description: Form to list a new property
+  - path: /host/edit-property/:id
+    file: client/src/pages/EditProperty.jsx
+    auth_required: true
+    description: Form to modify a property
+features:
+  - name: User Authentication
+    description: Signup, login, verify email/phone OTP, password reset
+    files:
+      - client/src/pages/Login.jsx
+      - client/src/pages/Register.jsx
+      - client/src/pages/ForgotPassword.jsx
+      - client/src/pages/VerifyOTP.jsx
+      - client/src/pages/VerifySignupOTP.jsx
+      - client/src/pages/ResetPassword.jsx
+    entry_route: /login
+    user_interactions:
+      - Fill login form with credentials
+      - Click submit to log in
+      - Fill registration form steps
+      - Enter received verification code
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/login
+      - method: POST
+        endpoint: /api/auth/register
+      - method: POST
+        endpoint: /api/auth/verify-signup-otp
+      - method: POST
+        endpoint: /api/auth/forgot-password
+      - method: POST
+        endpoint: /api/auth/verify-otp
+      - method: POST
+        endpoint: /api/auth/reset-password
+    auth_required: false
+  - name: Search and Filter Listings
+    description: Search listings by destination, price range, capacity, ratings, and categories
+    files:
+      - client/src/pages/Home.jsx
+    entry_route: /
+    user_interactions:
+      - Enter destination query in search bar
+      - Adjust price, guests, and rating filters
+      - Select a category tab (e.g. Beachfront)
+    api_calls:
+      - method: GET
+        endpoint: /api/properties
+    auth_required: false
+  - name: View Property Details
+    description: View detailed description, photos, leaflet map geolocation, reviews, and bookings
+    files:
+      - client/src/pages/PropertyDetail.jsx
+    entry_route: /properties/:id
+    user_interactions:
+      - View photo gallery
+      - Read host reviews and average rating score
+      - View property location on live Map
+    api_calls:
+      - method: GET
+        endpoint: /api/properties/:id
+    auth_required: false
+  - name: Book a Property
+    description: Book stays and pay via Razorpay integration
+    files:
+      - client/src/pages/PropertyDetail.jsx
+    entry_route: /properties/:id
+    user_interactions:
+      - Select check-in and check-out dates
+      - Calculate price and click Reserve
+      - Process mock Razorpay overlay checkout
+    api_calls:
+      - method: POST
+        endpoint: /api/bookings
+    auth_required: true
+  - name: Guest Host Direct Chat
+    description: Send messages to hosts/guests in real time using Socket.io
+    files:
+      - client/src/pages/Inbox.jsx
+    entry_route: /inbox
+    user_interactions:
+      - Open conversation from details page or inbox
+      - Type chat message and click send
+      - Read real-time updates
+    api_calls:
+      - method: GET
+        endpoint: /api/chat/rooms
+      - method: GET
+        endpoint: /api/chat/messages/:userId
+    auth_required: true
+  - name: Host Dashboard Management
+    description: Access revenue metrics, listing CRUD, and reservation requests
+    files:
+      - client/src/pages/HostDashboard.jsx
+      - client/src/pages/AddProperty.jsx
+      - client/src/pages/EditProperty.jsx
+    entry_route: /host/dashboard
+    user_interactions:
+      - Review host metrics charts/summaries
+      - Create, edit, and delete hosted properties
+      - View upcoming guest reservations
+    api_calls:
+      - method: GET
+        endpoint: /api/properties/host/listings
+      - method: GET
+        endpoint: /api/bookings/host/reservations
+      - method: POST
+        endpoint: /api/properties
+      - method: PUT
+        endpoint: /api/properties/:id
+      - method: DELETE
+        endpoint: /api/properties/:id
+    auth_required: true
+known_limitations: []

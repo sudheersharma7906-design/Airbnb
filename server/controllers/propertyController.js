@@ -108,11 +108,29 @@ const updateProperty = async (req, res) => {
     }
 
 
+    // Handle existing images retention / removal if provided in body
+    let currentImages = property.images || [];
+    if (req.body.existingImages !== undefined) {
+      if (Array.isArray(req.body.existingImages)) {
+        currentImages = req.body.existingImages;
+      } else if (typeof req.body.existingImages === 'string' && req.body.existingImages.trim()) {
+        try {
+          currentImages = JSON.parse(req.body.existingImages);
+        } catch (e) {
+          currentImages = [req.body.existingImages];
+        }
+      } else {
+        currentImages = [];
+      }
+    }
+
     if (req.files?.length) {
       const { getImageUrl } = require('../middleware/uploadMiddleware');
       const newImages = await Promise.all(req.files.map((file) => getImageUrl(file)));
-      property.images = [...property.images, ...newImages];
+      currentImages = [...currentImages, ...newImages];
     }
+
+    property.images = currentImages;
 
     await property.save();
     res.json(property);

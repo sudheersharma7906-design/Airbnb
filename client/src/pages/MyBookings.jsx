@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import { getImageUrl, DEFAULT_PROPERTY_IMAGE } from '../utils/imageUrl';
 import { Calendar, Users, MapPin, CheckCircle, XCircle, AlertCircle, Compass, FileText } from 'lucide-react';
 
 export default function MyBookings() {
@@ -59,17 +60,14 @@ export default function MyBookings() {
         
         {/* Left Side: Property Image */}
         <div className="w-full md:w-48 aspect-video md:aspect-auto bg-gray-100 shrink-0 relative">
-          {booking.propertyId?.images?.[0] ? (
-            <img
-              src={booking.propertyId.images[0]}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full bg-[#FF385C]/10 text-[#FF385C] font-extrabold text-2xl">
-              {booking.propertyId?.title?.charAt(0)}
-            </div>
-          )}
+          <img
+            src={getImageUrl(booking.propertyId?.images?.[0])}
+            alt=""
+            onError={(e) => {
+              e.target.src = DEFAULT_PROPERTY_IMAGE;
+            }}
+            className="w-full h-full object-cover"
+          />
           
           <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
             {booking.status}

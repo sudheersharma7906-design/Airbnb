@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import PropertyCard from '../components/PropertyCard';
@@ -6,6 +7,7 @@ import SearchFilters from '../components/SearchFilters';
 import { Palmtree, Tent, Sparkles, Building, Castle, Ship } from 'lucide-react';
 
 export default function Home() {
+  const [searchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -46,8 +48,19 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchProperties(filters);
-  }, []);
+    const cityParam = searchParams.get('city');
+    if (cityParam) {
+      const newFilters = { ...filters, city: cityParam };
+      setFilters(newFilters);
+      const matchedCategory = categories.find((c) => c.value === cityParam || c.id === cityParam);
+      if (matchedCategory) {
+        setActiveCategory(matchedCategory.id);
+      }
+      fetchProperties(newFilters);
+    } else {
+      fetchProperties(filters);
+    }
+  }, [searchParams]);
 
   const handleCategorySelect = (cat) => {
     setActiveCategory(cat.id);

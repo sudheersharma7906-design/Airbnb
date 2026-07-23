@@ -28,6 +28,7 @@ const propertyRoutes = require('./routes/propertyRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const aiSupportRoutes = require('./routes/aiSupportRoutes');
 const Message = require('./models/Message');
 
 const app = express();
@@ -51,6 +52,8 @@ app.use(
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://checkout.razorpay.com"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "img-src": [
           "'self'", 
           "data:", 
@@ -134,6 +137,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/ai-support', aiSupportRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Airbnb Clone API running' });
@@ -194,8 +198,26 @@ if (!process.env.MONGODB_URI) {
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('MongoDB connected');
+    
+    // Drop old non-sparse indexes on otps to fix duplicate key error for null emails/mobile numbers
+    try {
+      const otpsCollection = mongoose.connection.db.collection('otps');
+      await otpsCollection.dropIndex('email_1');
+      console.log('Successfully dropped old email_1 index from otps');
+    } catch (err) {
+      console.log('Info: email_1 index drop skipped or already dropped:', err.message);
+    }
+    
+    try {
+      const otpsCollection = mongoose.connection.db.collection('otps');
+      await otpsCollection.dropIndex('mobile_1');
+      console.log('Successfully dropped old mobile_1 index from otps');
+    } catch (err) {
+      console.log('Info: mobile_1 index drop skipped or already dropped:', err.message);
+    }
+
     server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch((err) => {

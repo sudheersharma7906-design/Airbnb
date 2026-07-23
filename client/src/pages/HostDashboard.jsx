@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import { getImageUrl, DEFAULT_PROPERTY_IMAGE } from '../utils/imageUrl';
 import { LayoutDashboard, PlusCircle, Users, CreditCard, Home, Calendar, Edit3, Trash2 } from 'lucide-react';
 
 export default function HostDashboard() {
@@ -150,12 +151,24 @@ export default function HostDashboard() {
                   key={p._id}
                   className="bg-white rounded-3xl border border-gray-150 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-md transition duration-200"
                 >
-                  <div className="overflow-hidden">
-                    <h3 className="font-extrabold text-gray-900 text-sm sm:text-base leading-snug truncate">{p.title}</h3>
-                    <p className="text-xs text-gray-400 mt-1 truncate">{p.location}</p>
-                    <p className="text-xs font-bold text-gray-800 mt-1.5 bg-[#FF385C]/5 text-[#FF385C] inline-block px-2.5 py-0.5 rounded-md">
-                      ₹{p.price.toLocaleString('en-IN')} / night
-                    </p>
+                  <div className="flex items-center gap-4 overflow-hidden">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 bg-gray-100 border border-gray-200">
+                      <img
+                        src={getImageUrl(p.images?.[0])}
+                        alt={p.title}
+                        onError={(e) => {
+                          e.target.src = DEFAULT_PROPERTY_IMAGE;
+                        }}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="overflow-hidden">
+                      <h3 className="font-extrabold text-gray-900 text-sm sm:text-base leading-snug truncate">{p.title}</h3>
+                      <p className="text-xs text-gray-400 mt-1 truncate">{p.location}</p>
+                      <p className="text-xs font-bold text-gray-800 mt-1.5 bg-[#FF385C]/5 text-[#FF385C] inline-block px-2.5 py-0.5 rounded-md">
+                        ₹{p.price.toLocaleString('en-IN')} / night
+                      </p>
+                    </div>
                   </div>
                   <div className="flex gap-2 shrink-0 w-full sm:w-auto">
                     <Link

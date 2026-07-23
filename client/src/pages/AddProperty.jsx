@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
-import { Home, FileText, Image, MapPin, IndianRupee, HelpCircle } from 'lucide-react';
+import { Home, FileText, Image, MapPin, IndianRupee, HelpCircle, X } from 'lucide-react';
 
 export default function AddProperty() {
   const navigate = useNavigate();
@@ -306,22 +306,38 @@ export default function AddProperty() {
               <label className="block text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
                 <Image className="w-3.5 h-3.5 text-gray-400" /> Upload Images (up to 5)
               </label>
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-gray-300 transition relative">
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-gray-300 transition relative bg-gray-50/50">
                 <input
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setImages(Array.from(e.target.files).slice(0, 5))}
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files);
+                    setImages((prev) => [...prev, ...newFiles]);
+                  }}
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 />
                 <p className="text-xs sm:text-sm text-gray-500 font-medium">Drag & drop files here, or <span className="text-[#FF385C] underline font-bold">browse</span></p>
-                <p className="text-[10px] text-gray-400 mt-1">Supports PNG, JPG, or JPEG formats. File limit: 5MB.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Supports PNG, JPG, or JPEG formats. File limit: 5MB per file.</p>
               </div>
+
               {images.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {images.map((f, i) => (
-                    <span key={i} className="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">{f.name}</span>
-                  ))}
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs font-bold text-gray-600">Selected Photos ({images.length}):</p>
+                  <div className="flex flex-wrap gap-2">
+                    {images.map((file, i) => (
+                      <div key={i} className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold px-3 py-1.5 rounded-full">
+                        <span className="truncate max-w-[150px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                          className="hover:text-red-700 cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

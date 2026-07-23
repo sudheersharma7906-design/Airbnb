@@ -48,8 +48,8 @@ export default function Footer() {
             <ul className="space-y-2.5 text-xs sm:text-sm text-gray-500 font-medium">
               <li><Link to="/host/dashboard" className="hover:text-[#FF385C] transition">Host Dashboard</Link></li>
               <li><Link to="/host/add-property" className="hover:text-[#FF385C] transition">List your Nesting Place</Link></li>
-              <li><a href="#" className="hover:text-[#FF385C] transition">Hosting guidelines</a></li>
-              <li><a href="#" className="hover:text-[#FF385C] transition">Community center</a></li>
+              <li><Link to="/privacy" className="hover:text-[#FF385C] transition">Hosting guidelines</Link></li>
+              <li><Link to="/sitemap" className="hover:text-[#FF385C] transition">Community center</Link></li>
             </ul>
           </div>
 
@@ -82,11 +82,11 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center sm:text-left">
             <span>© {new Date().getFullYear()} nestfinder, Inc.</span>
             <span className="hidden sm:inline">·</span>
-            <a href="#" className="hover:underline">Privacy</a>
+            <Link to="/privacy" className="hover:underline hover:text-gray-600">Privacy</Link>
             <span>·</span>
-            <a href="#" className="hover:underline">Terms</a>
+            <Link to="/terms" className="hover:underline hover:text-gray-600">Terms</Link>
             <span>·</span>
-            <a href="#" className="hover:underline">Sitemap</a>
+            <Link to="/sitemap" className="hover:underline hover:text-gray-600">Sitemap</Link>
           </div>
 
           <div className="flex items-center gap-6">

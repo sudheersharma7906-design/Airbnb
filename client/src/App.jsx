@@ -16,6 +16,10 @@ import HostDashboard from './pages/HostDashboard';
 import MyBookings from './pages/MyBookings';
 import Wishlist from './pages/Wishlist';
 import Inbox from './pages/Inbox';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Sitemap from './pages/Sitemap';
+import AIChatBot from './components/AIChatBot';
 
 function NotFound() {
   return (
@@ -40,6 +44,9 @@ export default function App() {
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-signup-otp" element={<VerifySignupOTP />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/sitemap" element={<Sitemap />} />
           <Route path="/properties/:id" element={<PropertyDetail />} />
 
           <Route
@@ -98,6 +105,7 @@ export default function App() {
         </Routes>
       </div>
       <Footer />
+      <AIChatBot />
     </div>
   );
 }

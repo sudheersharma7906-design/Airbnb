@@ -183,6 +183,10 @@ export default function VerifyOTP() {
           )}
 
           <form onSubmit={handleVerifyOTP} className="space-y-6">
+            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-300 text-[10px] p-2.5 rounded-xl text-center font-bold">
+              💡 Sandbox Mode: You can enter "123456" as the verification code.
+            </div>
+
             <div className="space-y-2">
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider text-center flex justify-center items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> 6-Digit OTP Code

@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import { Star, MapPin, Calendar, Users, Award, ShieldCheck, MessageSquare, CreditCard, Sparkles, AlertCircle } from 'lucide-react';
+import { getImageUrl, DEFAULT_PROPERTY_IMAGE } from '../utils/imageUrl';
+import { Star, MapPin, CheckCircle, ShieldCheck, Heart, Share2, Calendar, User, MessageCircle, Send, Award, Wifi, Sparkles, Navigation } from 'lucide-react';
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -255,9 +256,9 @@ export default function PropertyDetail() {
     );
   }
 
-  const galleryImages = property.images?.length ? property.images : [
-    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80'
-  ];
+  const galleryImages = property.images?.length
+    ? property.images.map((img) => getImageUrl(img))
+    : [DEFAULT_PROPERTY_IMAGE];
 
   return (
     <div className="min-h-screen bg-[#FCFCFC] pb-24">
@@ -285,14 +286,28 @@ export default function PropertyDetail() {
         {/* Gallery Image Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 rounded-2xl overflow-hidden aspect-video md:aspect-[21/9]">
           <div className="md:col-span-2 relative h-full">
-            <img src={galleryImages[0]} alt="" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
+            <img
+              src={galleryImages[0]}
+              alt=""
+              onError={(e) => {
+                e.target.src = DEFAULT_PROPERTY_IMAGE;
+              }}
+              className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer"
+            />
           </div>
           <div className="hidden md:grid grid-cols-2 col-span-2 gap-2 h-full">
             {Array.from({ length: 4 }).map((_, idx) => {
               const imgUrl = galleryImages[idx + 1] || galleryImages[0];
               return (
                 <div key={idx} className="relative h-full overflow-hidden bg-gray-100">
-                  <img src={imgUrl} alt="" className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer" />
+                  <img
+                    src={imgUrl}
+                    alt=""
+                    onError={(e) => {
+                      e.target.src = DEFAULT_PROPERTY_IMAGE;
+                    }}
+                    className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer"
+                  />
                 </div>
               );
             })}

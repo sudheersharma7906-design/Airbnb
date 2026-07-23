@@ -153,6 +153,20 @@ export default function Register() {
               />
             </div>
 
+            {/* Email Address */}
+            <div>
+              <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                <Mail className="w-3 h-3" /> Email Address <span className="text-[9px] text-gray-300 dark:text-zinc-600">(Optional)</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="sudheer@example.com"
+                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+              />
+            </div>
+
             {/* Mobile Number */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">

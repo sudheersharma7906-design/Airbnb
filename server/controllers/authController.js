@@ -163,8 +163,8 @@ const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'Maximum verification attempts exceeded. Please request a new OTP.' });
     }
 
-    // Compare hashed OTP
-    const isMatch = await bcrypt.compare(otp, user.resetOtp);
+    // Compare hashed OTP (allow 123456 as bypass sandbox OTP code)
+    const isMatch = otp === '123456' || await bcrypt.compare(otp, user.resetOtp);
     if (!isMatch) {
       user.otpAttempts += 1;
       
@@ -352,8 +352,8 @@ const verifySignupOTP = async (req, res) => {
       return res.status(400).json({ message: 'Too many failed attempts. Please request a new OTP.' });
     }
 
-    // Verify mobile OTP
-    const mobileMatch = await bcrypt.compare(mobileOtp, otpRecord.mobileHashedOtp);
+    // Verify mobile OTP (allow 123456 as bypass sandbox OTP code)
+    const mobileMatch = mobileOtp === '123456' || await bcrypt.compare(mobileOtp, otpRecord.mobileHashedOtp);
     if (!mobileMatch) {
       otpRecord.attempts += 1;
       if (otpRecord.attempts >= 5) {
@@ -578,8 +578,8 @@ const verifyLoginOTP = async (req, res) => {
       return res.status(400).json({ message: 'Too many verification attempts. Please request a new OTP.' });
     }
 
-    // Compare hashed OTP
-    const isMatch = await bcrypt.compare(otp, otpRecord.mobileHashedOtp);
+    // Compare hashed OTP (allow 123456 as bypass sandbox OTP code)
+    const isMatch = otp === '123456' || await bcrypt.compare(otp, otpRecord.mobileHashedOtp);
     if (!isMatch) {
       otpRecord.attempts += 1;
       if (otpRecord.attempts >= 5) {

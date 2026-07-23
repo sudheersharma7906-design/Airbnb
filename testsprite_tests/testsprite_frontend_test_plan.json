@@ -1,0 +1,1114 @@
+[
+  {
+    "id": "TC001",
+    "title": "Complete a property booking",
+    "description": "An authenticated traveler can select dates, review pricing, and finish checkout from a property detail page to receive a booking confirmation.",
+    "category": "Book a Property",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-in date"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-out date"
+      },
+      {
+        "type": "action",
+        "description": "Proceed to reserve the property"
+      },
+      {
+        "type": "action",
+        "description": "Complete the checkout flow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a booking confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Sign in and reach the authenticated experience",
+    "description": "This verifies that a returning user can sign in successfully and access the authenticated app state.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated experience is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Complete account registration with signup verification",
+    "description": "This verifies that a new user can create an account, complete signup verification, and enter the authenticated experience.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration details with valid information"
+      },
+      {
+        "type": "action",
+        "description": "Continue the registration flow"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid signup verification code"
+      },
+      {
+        "type": "action",
+        "description": "Complete account creation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated experience is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Complete signup verification and reach login",
+    "description": "A new user can register, complete signup OTP verification, and then access the login experience for the authenticated app.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid registration details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "action",
+        "description": "Enter the signup verification code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the signup verification form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the registration flow completes successfully"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the login experience is available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Recover an account and set a new password",
+    "description": "This verifies that a user can request password recovery, verify the recovery code, and reset the password successfully.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the account email for recovery"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /verify-otp"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid verification code"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Set a new password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password reset confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Open a listing from search results",
+    "description": "A traveler can load the home page search results and open a property detail page from the listing grid.",
+    "category": "Search and browse listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the listings to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a property listing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the property detail page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open a property and review its details",
+    "description": "This verifies that a traveler can open a property page and inspect photos, descriptions, reviews, and map location before booking.",
+    "category": "View Property Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open a property detail page from the listings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property photos are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property details, reviews, and map location are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "See booking price before checkout",
+    "description": "An authenticated traveler can select stay dates on a property detail page and see the booking price summary update before starting checkout.",
+    "category": "Book a Property",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-in date"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-out date"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the price summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the calculated booking total is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Search and filter listings on the home page",
+    "description": "This verifies that a traveler can search and refine listings by destination, filters, and category and see updated results.",
+    "category": "Search and Filter Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Enter a destination query"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the price filter"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the guest filter"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the rating filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a category"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the filtered property results are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Request a password reset and verify the reset step",
+    "description": "A user can request password recovery, complete OTP verification, and reach the reset password page.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the account email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password recovery request"
+      },
+      {
+        "type": "action",
+        "description": "Enter the password reset verification code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset verification form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the reset password step is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the password reset form is available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "View property details, reviews, and map information",
+    "description": "A traveler can open a property detail page and review the photos, map, and guest reviews before booking.",
+    "category": "Search and browse listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the listings to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a property listing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property photos are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property map and reviews are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Review host dashboard metrics and reservations",
+    "description": "A host can sign in and review dashboard metrics, hosted listings, and upcoming reservations.",
+    "category": "Host Dashboard Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify host metrics are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify upcoming reservations are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Compare listing details before booking",
+    "description": "This verifies that a traveler can inspect the gallery and supporting property information needed to decide whether to book.",
+    "category": "View Property Details",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /properties/:id using a visible property from the listings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the property gallery is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify amenity and review information are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Send a message from property context",
+    "description": "An authenticated traveler can open the host conversation from a property page and send a message that appears in the thread.",
+    "category": "Guest Host Direct Chat",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Open the related conversation"
+      },
+      {
+        "type": "action",
+        "description": "Type a message into the chat input"
+      },
+      {
+        "type": "action",
+        "description": "Send the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new message appears in the conversation"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Save a property to the wishlist",
+    "description": "An authenticated traveler can save a property and later see it in the wishlist.",
+    "category": "Wishlist",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Save the property to the wishlist"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /wishlist"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved property appears in the wishlist"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Browse listings with filters only",
+    "description": "This verifies that a traveler can update filters without a destination query and still see results refresh correctly.",
+    "category": "Search and Filter Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the price filter"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the guest filter"
+      },
+      {
+        "type": "action",
+        "description": "Adjust the rating filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the property results are updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Read and reply in inbox conversations",
+    "description": "An authenticated user can open an existing inbox conversation, read recent messages, and send a reply.",
+    "category": "Guest Host Direct Chat",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /inbox"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing conversation"
+      },
+      {
+        "type": "action",
+        "description": "Type a reply into the chat input"
+      },
+      {
+        "type": "action",
+        "description": "Send the reply"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated conversation is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Browse properties by category",
+    "description": "This verifies that selecting a category on the home page narrows the visible property cards to that category.",
+    "category": "Search and Filter Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Select a category"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the category-specific property cards are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Create a new host listing",
+    "description": "A host can add a new property listing and see it reflected in the hosted listings on the dashboard.",
+    "category": "Host Dashboard Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/add-property"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid property details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the new property form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new listing appears in the hosted listings"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Edit an existing host listing",
+    "description": "A host can update an existing listing and see the edited details reflected on the dashboard.",
+    "category": "Host Dashboard Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing property for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the listing details"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated property information is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Delete a host listing",
+    "description": "A host can delete a listing and see it removed from the dashboard listing collection.",
+    "category": "Host Dashboard Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Delete an existing property listing"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing is removed from the hosted listings"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Show validation feedback for incomplete registration",
+    "description": "This verifies that invalid or incomplete registration details are rejected with visible form validation feedback.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration details with invalid information"
+      },
+      {
+        "type": "action",
+        "description": "Continue the registration flow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify registration validation feedback is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Reject invalid booking dates",
+    "description": "An authenticated traveler sees date validation feedback when attempting to reserve a property with invalid or unavailable stay dates.",
+    "category": "Book a Property",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Select an invalid check-in date"
+      },
+      {
+        "type": "action",
+        "description": "Select an invalid check-out date"
+      },
+      {
+        "type": "action",
+        "description": "Proceed to reserve the property"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a date validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Reject an incorrect signup verification code",
+    "description": "This verifies that entering the wrong signup verification code shows failure feedback and does not complete signup.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /verify-signup-otp"
+      },
+      {
+        "type": "action",
+        "description": "Enter an incorrect verification code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the verification code"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify signup verification failure feedback is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC025",
+    "title": "Show an empty wishlist state",
+    "description": "An authenticated traveler sees an empty state when no properties have been saved to the wishlist.",
+    "category": "Wishlist",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /wishlist"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty wishlist message is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC026",
+    "title": "Reject mismatched password reset values",
+    "description": "This verifies that mismatched or invalid password reset inputs are blocked with visible validation feedback.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Enter mismatched password values"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify password validation feedback is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC027",
+    "title": "Open a booking from property details",
+    "description": "An authenticated traveler can open the chat or booking-related conversation from a property page and return to the relevant in-app interaction.",
+    "category": "Book a Property",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /properties/1"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-in date"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check-out date"
+      },
+      {
+        "type": "action",
+        "description": "Start checkout"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the checkout overlay is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the payment step is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC028",
+    "title": "Show an empty state when no listings match",
+    "description": "A traveler sees an empty state when search filters produce no matching listings.",
+    "category": "Search and browse listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the listings to load"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the destination field with a destination that has no matches"
+      },
+      {
+        "type": "action",
+        "description": "Apply the search filters"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC029",
+    "title": "Show validation errors when creating a listing with missing details",
+    "description": "A host sees validation feedback when submitting the add property form without required information.",
+    "category": "Host Dashboard Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /host/add-property"
+      },
+      {
+        "type": "action",
+        "description": "Submit the new property form without completing required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify property form validation errors are visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC030",
+    "title": "Show validation feedback for invalid signup details",
+    "description": "A new user sees validation errors when submitting registration details that do not meet the form requirements.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form without completing required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify registration validation errors are visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC031",
+    "title": "Show the inbox empty state",
+    "description": "An authenticated user sees an empty state in the inbox when there are no conversations available.",
+    "category": "Guest Host Direct Chat",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty inbox message is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC032",
+    "title": "Show validation feedback for mismatched reset passwords",
+    "description": "A user sees validation feedback when the new password and confirmation do not match during password reset.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the new password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the confirmation password field with a different valid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password reset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password mismatch validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  }
+]

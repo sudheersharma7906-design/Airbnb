@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Heart, Star, MapPin } from 'lucide-react';
+import { getImageUrl, DEFAULT_PROPERTY_IMAGE } from '../utils/imageUrl';
 
 export default function PropertyCard({ property }) {
   const { user, toggleWishlist } = useAuth();
@@ -25,19 +26,14 @@ export default function PropertyCard({ property }) {
         
         {/* Image Section */}
         <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden w-full">
-          {image ? (
-            <img
-              src={image}
-              alt={property.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full bg-gradient-to-br from-[#FF385C]/10 to-[#FF385C]/5">
-              <span className="text-4xl font-extrabold text-[#FF385C]">
-                {property.title.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
+          <img
+            src={getImageUrl(image)}
+            alt={property.title}
+            onError={(e) => {
+              e.target.src = DEFAULT_PROPERTY_IMAGE;
+            }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
 
           {/* Location Badge */}
           <div className="absolute top-3 left-3 bg-black/65 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">

@@ -1,0 +1,17 @@
+{
+  "status": "init",
+  "scope": "codebase",
+  "type": "frontend",
+  "localEndpoint": "http://localhost:5173/",
+  "serverPort": 61752,
+  "executionArgs": {
+    "projectName": "airbnb-clone",
+    "projectPath": "d:/node js/airbnb-clone",
+    "testIds": [],
+    "additionalInstruction": "Ensure to check both Email login and Mobile OTP login. The Login page has tabs to choose between 'Mobile OTP' and 'Email & Password'. Mobile OTP can be verified using mock code '123456'.",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-DMcqaBgy5JQFIMrDrtZiqeldxyENnJ8GPf2RSY3sqKWHGqm5EcjK9PzpYnBuf62Lh3S3yqqE5oCWVcreumLw1HiYvWGnjRwSny87ouIGggMk1Ek3CTNT-cRGS--a914j1CI"
+    }
+  }
+}

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
-import { Home, FileText, Image, MapPin, IndianRupee, HelpCircle, Edit2 } from 'lucide-react';
+import { Home, FileText, Image, MapPin, IndianRupee, HelpCircle, Edit2, Trash2, X } from 'lucide-react';
+import { getImageUrl as formatImageUrl } from '../utils/imageUrl';
 
 export default function EditProperty() {
   const { id } = useParams();
@@ -10,6 +11,7 @@ export default function EditProperty() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
   const [images, setImages] = useState([]);
   const [coords, setCoords] = useState({ lat: 28.6139, lng: 77.2090 });
   const [leafletReady, setLeafletReady] = useState(!!window.L);
@@ -41,6 +43,7 @@ export default function EditProperty() {
         bathrooms: data.bathrooms,
         amenities: data.amenities?.join(', ') || '',
       });
+      setExistingImages(data.images || []);
       setCoords({ lat: data.lat || 28.6139, lng: data.lng || 77.2090 });
     });
   }, [id]);
@@ -141,6 +144,7 @@ export default function EditProperty() {
       images.forEach((file) => data.append('images', file));
       data.append('lat', coords.lat);
       data.append('lng', coords.lng);
+      data.append('existingImages', JSON.stringify(existingImages));
 
       await api.put(`/properties/${id}`, data);
       navigate('/host/dashboard');
@@ -320,26 +324,74 @@ export default function EditProperty() {
               />
             </div>
 
+            {/* Existing Uploaded Images */}
+            {existingImages.length > 0 && (
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2">
+                  Current Listing Photos ({existingImages.length})
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                  {existingImages.map((imgUrl, index) => (
+                    <div key={index} className="relative aspect-video rounded-xl overflow-hidden group border border-gray-200 bg-gray-50">
+                      <img
+                        src={formatImageUrl(imgUrl)}
+                        alt={`Listing photo ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setExistingImages(existingImages.filter((_, i) => i !== index))}
+                        className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-red-600 text-white p-1 rounded-full shadow transition cursor-pointer"
+                        title="Remove photo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
-                <Image className="w-3.5 h-3.5 text-gray-400" /> Upload More Images (optional)
+                <Image className="w-3.5 h-3.5 text-gray-400" /> Upload More Photos
               </label>
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-gray-300 transition relative">
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-gray-300 transition relative bg-gray-50/50">
                 <input
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setImages(Array.from(e.target.files))}
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files);
+                    setImages((prev) => [...prev, ...newFiles]);
+                  }}
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 />
                 <p className="text-xs sm:text-sm text-gray-500 font-medium">Drag & drop files here, or <span className="text-[#FF385C] underline font-bold">browse</span></p>
-                <p className="text-[10px] text-gray-400 mt-1">Supports PNG, JPG, or JPEG formats. File limit: 5MB.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Supports PNG, JPG, or JPEG formats. File limit: 5MB per file.</p>
               </div>
+
+              {/* Newly selected images previews */}
               {images.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {images.map((f, i) => (
-                    <span key={i} className="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1 rounded-full">{f.name}</span>
-                  ))}
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs font-bold text-gray-600">Newly Added Photos to Upload ({images.length}):</p>
+                  <div className="flex flex-wrap gap-2">
+                    {images.map((file, i) => (
+                      <div key={i} className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold px-3 py-1.5 rounded-full">
+                        <span className="truncate max-w-[150px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                          className="hover:text-red-700 cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
