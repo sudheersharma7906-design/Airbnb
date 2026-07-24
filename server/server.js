@@ -46,6 +46,29 @@ const apiLimiter = rateLimit({
 });
 
 // Configure Helmet to set secure HTTP headers with custom CSP rules
+// Dynamically build allowed origins from CLIENT_URL env var for production support
+const productionUrl = process.env.CLIENT_URL && process.env.CLIENT_URL !== 'http://localhost:5173'
+  ? process.env.CLIENT_URL
+  : null;
+
+const allowedConnectSrc = [
+  "'self'",
+  "ws:",
+  "wss:",
+  "http://localhost:5000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5000",
+  "https://api.razorpay.com",
+  "https://nestfinder-bookings.onrender.com",
+  "wss://nestfinder-bookings.onrender.com",
+];
+
+// Add dynamic CLIENT_URL if set and different from localhost
+if (productionUrl) {
+  allowedConnectSrc.push(productionUrl);
+  allowedConnectSrc.push(productionUrl.replace('https://', 'wss://'));
+}
+
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -55,25 +78,19 @@ app.use(
         "style-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "img-src": [
-          "'self'", 
-          "data:", 
-          "blob:", 
-          "https://res.cloudinary.com", 
-          "https://*.cloudinary.com", 
-          "https://*.tile.openstreetmap.org", 
-          "https://unpkg.com", 
+          "'self'",
+          "data:",
+          "blob:",
+          "https://res.cloudinary.com",
+          "https://*.cloudinary.com",
+          "https://*.tile.openstreetmap.org",
+          "https://unpkg.com",
           "https://cdnjs.cloudflare.com",
-          "https://checkout.razorpay.com"
+          "https://checkout.razorpay.com",
+          "https://images.unsplash.com",
+          "https://nestfinder-bookings.onrender.com",
         ],
-        "connect-src": [
-          "'self'", 
-          "ws:", 
-          "wss:", 
-          "http://localhost:5000", 
-          "http://localhost:5173", 
-          "http://127.0.0.1:5000", 
-          "https://api.razorpay.com"
-        ],
+        "connect-src": allowedConnectSrc,
         "frame-src": ["'self'", "https://api.razorpay.com", "https://*.razorpay.com"],
       },
     },
@@ -114,9 +131,20 @@ app.use((req, res, next) => {
   next();
 });
 const server = http.createServer(app);
+
+// Allow multiple origins: localhost for dev + production URL for live site
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'https://nestfinder-bookings.onrender.com',
+];
+if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -124,7 +152,14 @@ const io = new Server(server, {
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, etc.) or matching origins
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS: ' + origin));
+      }
+    },
     credentials: true,
   })
 );

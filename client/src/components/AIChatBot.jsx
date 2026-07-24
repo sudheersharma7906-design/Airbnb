@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { Bot, Sparkles, X, Send, RotateCcw, Minus, MessageSquare, ChevronDown } from 'lucide-react';
 
 const SUGGESTED_QUESTIONS = [
@@ -78,7 +78,7 @@ export default function AIChatBot() {
 
     try {
       // Backend endpoint
-      const response = await axios.post('/api/ai-support/chat', {
+      const response = await api.post('/ai-support/chat', {
         message: messageText.trim(),
         conversationHistory: messages.slice(-8) // Send recent history for context
       });
