@@ -402,9 +402,40 @@ export default function PropertyDetail() {
             )}
 
             {/* Map Section */}
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Where you'll be</h3>
-              <div id="property-map" className="w-full h-72 sm:h-96 bg-gray-100 rounded-2xl border border-gray-100 shadow-sm relative"></div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Navigation className="w-5 h-5 text-[#FF385C]" />
+                    <span>Where you'll be</span>
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">{property.location}</p>
+                </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location || property.city)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-[#FF385C]" />
+                  <span>Get Directions</span>
+                </a>
+              </div>
+
+              {/* Map Container with Leaflet + Google Maps Embed Fallback */}
+              <div className="w-full h-80 sm:h-96 bg-gray-100 rounded-2xl border border-gray-150 shadow-xs relative overflow-hidden">
+                {/* Leaflet map target container */}
+                <div id="property-map" className="w-full h-full relative z-10"></div>
+
+                {/* Google Maps Embed iframe fallback if Leaflet map tiles are slow/loading */}
+                <iframe
+                  title="Property Location Map"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(property.location || property.city)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                  className="w-full h-full absolute inset-0 border-0 z-0"
+                  loading="lazy"
+                  allowFullScreen
+                ></iframe>
+              </div>
             </div>
 
             {/* Reviews Section */}

@@ -61,6 +61,9 @@ const allowedConnectSrc = [
   "https://api.razorpay.com",
   "https://nestfinder-bookings.onrender.com",
   "wss://nestfinder-bookings.onrender.com",
+  "https://nominatim.openstreetmap.org",
+  "https://*.tile.openstreetmap.org",
+  "https://tile.openstreetmap.org",
 ];
 
 // Add dynamic CLIENT_URL if set and different from localhost
@@ -74,7 +77,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdnjs.cloudflare.com", "https://checkout.razorpay.com"],
+        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdnjs.cloudflare.com", "https://checkout.razorpay.com", "https://maps.google.com"],
         "style-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "img-src": [
@@ -84,14 +87,17 @@ app.use(
           "https://res.cloudinary.com",
           "https://*.cloudinary.com",
           "https://*.tile.openstreetmap.org",
+          "https://tile.openstreetmap.org",
           "https://unpkg.com",
           "https://cdnjs.cloudflare.com",
           "https://checkout.razorpay.com",
           "https://images.unsplash.com",
           "https://nestfinder-bookings.onrender.com",
+          "https://*.google.com",
+          "https://*.googleapis.com",
         ],
         "connect-src": allowedConnectSrc,
-        "frame-src": ["'self'", "https://api.razorpay.com", "https://*.razorpay.com"],
+        "frame-src": ["'self'", "https://api.razorpay.com", "https://*.razorpay.com", "https://maps.google.com", "https://*.google.com", "https://www.openstreetmap.org"],
       },
     },
     crossOriginEmbedderPolicy: false,
