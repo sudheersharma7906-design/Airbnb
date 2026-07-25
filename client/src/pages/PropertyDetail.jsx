@@ -73,9 +73,12 @@ export default function PropertyDetail() {
     fetchData();
   }, [id]);
 
-  // Leaflet Map Initialization
+  // Leaflet Map Initialization & Geocoding
   useEffect(() => {
     if (!property || !leafletReady || !window.L) return;
+
+    let map;
+    let isMounted = true;
 
     // Fix default Leaflet icon path resolution in Vite
     delete window.L.Icon.Default.prototype._getIconUrl;
@@ -85,31 +88,57 @@ export default function PropertyDetail() {
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
     });
 
-    const coords = [property.lat || 28.6139, property.lng || 77.2090];
+    const initMap = async () => {
+      let coords = [property.lat || 28.6139, property.lng || 77.2090];
 
-    let map;
-    try {
-      const container = document.getElementById('property-map');
-      if (!container) return;
-      if (container._leaflet_id) {
-        // Already initialized, do not re-create
-        return;
+      // If coordinates are default, attempt Nominatim geocoding based on location string
+      const isDefaultCoords = (Math.abs(coords[0] - 28.6139) < 0.001 && Math.abs(coords[1] - 77.2090) < 0.001);
+      if (isDefaultCoords && property.location) {
+        try {
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(property.location)}`
+          );
+          const geoData = await geoRes.json();
+          if (geoData && geoData.length > 0 && isMounted) {
+            coords = [parseFloat(geoData[0].lat), parseFloat(geoData[0].lon)];
+          }
+        } catch (e) {
+          console.warn('Geocoding failed, using fallback coordinates', e);
+        }
       }
-      map = window.L.map('property-map', { scrollWheelZoom: false }).setView(coords, 14);
-      
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
 
-      window.L.marker(coords)
-        .addTo(map)
-        .bindPopup(`<b>${property.title}</b><br/>Exact coordinates: ${coords[0]}, ${coords[1]}`)
-        .openPopup();
-    } catch (err) {
-      console.warn('Map initialization failed:', err);
-    }
+      if (!isMounted) return;
+
+      try {
+        const container = document.getElementById('property-map');
+        if (!container) return;
+        if (container._leaflet_id) {
+          container._leaflet_id = null;
+        }
+
+        map = window.L.map('property-map', { scrollWheelZoom: false }).setView(coords, 13);
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        window.L.marker(coords)
+          .addTo(map)
+          .bindPopup(`<b>${property.title}</b><br/>${property.location}`)
+          .openPopup();
+
+        setTimeout(() => {
+          if (map) map.invalidateSize();
+        }, 300);
+      } catch (err) {
+        console.warn('Map initialization failed:', err);
+      }
+    };
+
+    initMap();
 
     return () => {
+      isMounted = false;
       if (map) {
         map.remove();
       }
@@ -553,14 +582,14 @@ export default function PropertyDetail() {
               )}
 
               {/* Chat panel initiator */}
-              {user && user._id !== property.hostId?._id && (
+              {(!user || user._id !== property.hostId?._id) && (
                 <div className="border-t border-gray-100 pt-4 text-center">
                   <Link
-                    to={`/inbox?userId=${property.hostId?._id || ''}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-[#FF385C] underline transition"
+                    to={user ? `/inbox?userId=${property.hostId?._id || ''}` : '/login'}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-2xl shadow-sm transition hover:scale-101 active:scale-99 text-xs sm:text-sm cursor-pointer"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Have questions? Message host</span>
+                    <MessageSquare className="w-4 h-4 text-[#FF385C]" />
+                    <span>Chat with Property Host</span>
                   </Link>
                 </div>
               )}

@@ -138,46 +138,7 @@ export default function Inbox() {
       console.error(err);
     }
 
-    const currentMsgText = inputText.trim();
     setInputText('');
-
-    // 3. Host Emulator Auto-Reply (Simulated Response)
-    // Runs when user is traveler and activeUser is a host
-    if (user.role === 'user') {
-      setTimeout(async () => {
-        let reply = "Hello! Thanks for reaching out. I'd be happy to host you. Let me know if you have booking queries!";
-        if (currentMsgText.toLowerCase().includes('price') || currentMsgText.toLowerCase().includes('discount')) {
-          reply = "The price is as listed on the calendar. We do offer a 5% discount for weekly stays and 10% for monthly bookings.";
-        } else if (currentMsgText.toLowerCase().includes('check')) {
-          reply = "Standard check-in is at 2:00 PM and check-out is at 11:00 AM. Early check-in can be arranged if requested in advance.";
-        } else if (currentMsgText.toLowerCase().includes('wifi') || currentMsgText.toLowerCase().includes('internet')) {
-          reply = "Yes, we have high-speed fiber internet (above 100 Mbps) which is perfect for remote work!";
-        } else if (currentMsgText.toLowerCase().includes('pool') || currentMsgText.toLowerCase().includes('beach')) {
-          reply = "Yes, you have direct access! We keep it clean and maintained daily.";
-        }
-
-        const simulatedReply = {
-          _id: `reply_mock_${Date.now()}`,
-          senderId: activeUser._id,
-          receiverId: user._id,
-          message: reply,
-          createdAt: new Date().toISOString()
-        };
-
-        // Append locally to show on screen
-        setMessages((prev) => [...prev, simulatedReply]);
-
-        // Save in DB
-        try {
-          await api.post('/chat/send', {
-            receiverId: user._id,
-            message: reply,
-          });
-        } catch (err) {
-          console.error(err);
-        }
-      }, 2000);
-    }
   };
 
   if (!user) {
@@ -256,7 +217,7 @@ export default function Inbox() {
                   </div>
                   <div>
                     <h3 className="font-extrabold text-gray-900 text-sm sm:text-base leading-tight">{activeUser.name}</h3>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-0.5">{activeUser.role} · Offline (Auto-Reply Active)</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-0.5">{activeUser.role || 'Host'}</p>
                   </div>
                 </div>
 
