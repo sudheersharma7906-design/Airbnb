@@ -167,9 +167,8 @@ export default function Login() {
                   </button>
                 </div>
 
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-300 text-[10px] p-2.5 rounded-xl text-center font-bold">
-                  💡 Sandbox Mode: You can enter "123456" as the verification code.
-                </div>
+
+
 
                 <div>
                   <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">

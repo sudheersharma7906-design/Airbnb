@@ -7,12 +7,8 @@ const sendSMS = async (to, body) => {
     const fromPhone = process.env.TWILIO_PHONE_NUMBER;
 
     if (!accountSid || !authToken || !fromPhone) {
-      console.log(`\n==================================================`);
-      console.log(`[SMS SIMULATOR]`);
-      console.log(`To: ${to}`);
-      console.log(`Body: ${body}`);
-      console.log(`==================================================\n`);
-      return true;
+      console.error('[SMS] Twilio credentials are not configured. Cannot send SMS.');
+      return false;
     }
 
     const client = twilio(accountSid, authToken);
@@ -25,14 +21,13 @@ const sendSMS = async (to, body) => {
     console.log(`[SMS] Sent successfully to ${to}, SID: ${message.sid}`);
     return true;
   } catch (error) {
-    console.error('SMS sending failed:', error.message);
-    // Return true in development fallback so we don't block the flow if Twilio fails
-    return true;
+    console.error('[SMS] Sending failed:', error.message);
+    return false;
   }
 };
 
 const sendSignupOTPSMS = async (mobile, otp) => {
-  const body = `Your verification code is ${otp}. It expires in 5 minutes.`;
+  const body = `Your Nestfinder verification code is ${otp}. It expires in 5 minutes. Do not share this code with anyone.`;
   return sendSMS(mobile, body);
 };
 

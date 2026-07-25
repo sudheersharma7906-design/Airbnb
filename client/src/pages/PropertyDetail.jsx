@@ -4,7 +4,7 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import { getImageUrl, DEFAULT_PROPERTY_IMAGE } from '../utils/imageUrl';
-import { Star, MapPin, CheckCircle, ShieldCheck, Heart, Share2, Calendar, User, MessageCircle, Send, Award, Wifi, Sparkles, Navigation } from 'lucide-react';
+import { Star, MapPin, CheckCircle, ShieldCheck, Heart, Share2, Calendar, User, MessageCircle, MessageSquare, Send, Award, Wifi, Sparkles, Navigation, AlertCircle, CreditCard } from 'lucide-react';
 
 export default function PropertyDetail() {
   const { id } = useParams();

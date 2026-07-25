@@ -163,8 +163,8 @@ const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'Maximum verification attempts exceeded. Please request a new OTP.' });
     }
 
-    // Compare hashed OTP (allow 123456 as bypass sandbox OTP code)
-    const isMatch = otp === '123456' || await bcrypt.compare(otp, user.resetOtp);
+    // Compare hashed OTP
+    const isMatch = await bcrypt.compare(otp, user.resetOtp);
     if (!isMatch) {
       user.otpAttempts += 1;
       
@@ -308,7 +308,10 @@ const sendSignupOTP = async (req, res) => {
     });
 
     // Send mobile OTP
-    await sendSignupOTPSMS(formattedMobile, mobileOtp);
+    const smsSent = await sendSignupOTPSMS(formattedMobile, mobileOtp);
+    if (!smsSent) {
+      return res.status(500).json({ message: 'Failed to send OTP. Please check your mobile number and try again.' });
+    }
 
     res.json({ message: 'Verification OTP sent successfully to mobile' });
   } catch (error) {
@@ -352,8 +355,8 @@ const verifySignupOTP = async (req, res) => {
       return res.status(400).json({ message: 'Too many failed attempts. Please request a new OTP.' });
     }
 
-    // Verify mobile OTP (allow 123456 as bypass sandbox OTP code)
-    const mobileMatch = mobileOtp === '123456' || await bcrypt.compare(mobileOtp, otpRecord.mobileHashedOtp);
+    // Verify mobile OTP
+    const mobileMatch = await bcrypt.compare(mobileOtp, otpRecord.mobileHashedOtp);
     if (!mobileMatch) {
       otpRecord.attempts += 1;
       if (otpRecord.attempts >= 5) {
@@ -417,7 +420,10 @@ const resendSignupOTP = async (req, res) => {
     await otpRecord.save();
 
     // Send mobile OTP
-    await sendSignupOTPSMS(otpRecord.mobile, mobileOtp);
+    const smsSent = await sendSignupOTPSMS(otpRecord.mobile, mobileOtp);
+    if (!smsSent) {
+      return res.status(500).json({ message: 'Failed to send OTP. Please try again later.' });
+    }
 
     res.json({ message: 'A new OTP has been sent.' });
   } catch (error) {
@@ -535,7 +541,10 @@ const sendLoginOTP = async (req, res) => {
     });
 
     // Send OTP via SMS
-    await sendSignupOTPSMS(formattedMobile, otp);
+    const smsSent = await sendSignupOTPSMS(formattedMobile, otp);
+    if (!smsSent) {
+      return res.status(500).json({ message: 'Failed to send OTP. Please check your mobile number and try again.' });
+    }
 
     res.json({ message: 'Login OTP sent successfully' });
   } catch (error) {
@@ -578,8 +587,8 @@ const verifyLoginOTP = async (req, res) => {
       return res.status(400).json({ message: 'Too many verification attempts. Please request a new OTP.' });
     }
 
-    // Compare hashed OTP (allow 123456 as bypass sandbox OTP code)
-    const isMatch = otp === '123456' || await bcrypt.compare(otp, otpRecord.mobileHashedOtp);
+    // Compare hashed OTP
+    const isMatch = await bcrypt.compare(otp, otpRecord.mobileHashedOtp);
     if (!isMatch) {
       otpRecord.attempts += 1;
       if (otpRecord.attempts >= 5) {
