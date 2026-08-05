@@ -118,16 +118,6 @@ npm run dev
 Your Vite frontend will be live on **[http://localhost:5173](http://localhost:5173)** and the Express server on **[http://localhost:5000](http://localhost:5000)**.
 
 ---
-
-## 🔑 Test Credentials
-
-* **Traveler / Guest Account**:
-  * **Email**: `guest@example.com`
-  * **Password**: `password123`
-* **Host Account**:
-  * **Email**: `host@example.com`
-  * **Password**: `password123`
-
 ---
 
 ## 📬 Contact & Support
