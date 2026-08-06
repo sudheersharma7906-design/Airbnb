@@ -1,29 +1,15 @@
-const twilio = require('twilio');
+/**
+ * SMS Service Module
+ * Handles SMS OTP dispatches and console simulation.
+ */
 
 const sendSMS = async (to, body) => {
-  try {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const fromPhone = process.env.TWILIO_PHONE_NUMBER;
-
-    if (!accountSid || !authToken || !fromPhone) {
-      console.error('[SMS] Twilio credentials are not configured. Cannot send SMS.');
-      return false;
-    }
-
-    const client = twilio(accountSid, authToken);
-    const message = await client.messages.create({
-      body,
-      from: fromPhone,
-      to,
-    });
-
-    console.log(`[SMS] Sent successfully to ${to}, SID: ${message.sid}`);
-    return true;
-  } catch (error) {
-    console.error('[SMS] Sending failed:', error.message);
-    return false;
-  }
+  console.log(`\n==================================================`);
+  console.log(`[SMS SIMULATOR - DEV CONSOLE]`);
+  console.log(`To: ${to}`);
+  console.log(`Body: ${body}`);
+  console.log(`==================================================\n`);
+  return true;
 };
 
 const sendSignupOTPSMS = async (mobile, otp) => {

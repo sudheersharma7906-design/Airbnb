@@ -41,12 +41,13 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
+  const login = async (identifier, password) => {
+    const { data } = await api.post('/auth/login', { identifier, email: identifier, password });
     localStorage.setItem('airbnb_user', JSON.stringify(data));
     setUser(data);
     return data;
   };
+
 
   const sendLoginOTP = async (mobile) => {
     const { data } = await api.post('/auth/send-login-otp', { mobile });
@@ -60,12 +61,14 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const register = async (name, email, password, role = 'user') => {
-    const { data } = await api.post('/auth/register', { name, email, password, role });
+  const register = async (userData) => {
+    const payload = typeof userData === 'object' ? userData : { name: arguments[0], email: arguments[1], password: arguments[2], role: arguments[3] };
+    const { data } = await api.post('/auth/register', payload);
     localStorage.setItem('airbnb_user', JSON.stringify(data));
     setUser(data);
     return data;
   };
+
 
   const signupOTP = async (payload) => {
     const { data } = await api.post('/auth/signup', payload);

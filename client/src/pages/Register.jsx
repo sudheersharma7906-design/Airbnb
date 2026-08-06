@@ -1,27 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import api from '../utils/api';
-import { Sparkles, User, Mail, Lock, Phone, UserCheck, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Sparkles, User, Mail, Lock, Phone, CheckCircle, Eye, EyeOff, Building, UserCheck } from 'lucide-react';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   
   const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('Guest'); // 'Guest' or 'Host'
+  const [role, setRole] = useState('user'); // 'user' (Guest) or 'host' (Host)
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  // Password strength validation state
+  // Password strength rules check
   const [passwordRules, setPasswordRules] = useState({
     minLength: false,
     uppercase: false,
@@ -45,7 +46,7 @@ export default function Register() {
     setError('');
 
     // Field Validations
-    if (!fullName || !mobile || !password || !role) {
+    if (!fullName || !email || !mobile || !password) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -67,38 +68,41 @@ export default function Register() {
       return;
     }
 
-    // Mobile format check (E.164 format: e.g. +919876543210 or 9876543210)
-    if (!/^\+?[1-9]\d{1,14}$/.test(mobile.trim())) {
-      setError('Please enter a valid mobile number (e.g. +919876543210 or 9876543210).');
+    // Mobile number validation (10 digits or E.164)
+    const cleanMobile = mobile.trim().replace(/\D/g, '');
+    if (cleanMobile.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
     setLoading(true);
     try {
       const payload = {
+        name: fullName.trim(),
         fullName: fullName.trim(),
-        username: username.trim() || undefined,
-        email: email.trim() || undefined,
+        email: email.trim().toLowerCase(),
         mobile: mobile.trim(),
         password,
-        confirmPassword,
-        role,
+        role: role === 'host' ? 'host' : 'user',
       };
 
-      // Call API to send signup OTP
-      await api.post('/auth/send-signup-otp', payload);
+      // Call Direct Signup API (No OTP required)
+      const userData = await register(payload);
       
-      // Redirect to OTP verification page with all payload data in router state
-      navigate('/verify-signup-otp', { state: { signupData: payload } });
+      setSuccess(true);
+      setTimeout(() => {
+        const redirectPath = userData?.role === 'host' ? '/host/dashboard' : '/';
+        navigate(redirectPath);
+      }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to initiate signup process.');
+      setError(err.response?.data?.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const isPasswordValid = Object.values(passwordRules).every(Boolean);
-  const isFormValid = fullName && mobile && isPasswordValid && password === confirmPassword && acceptTerms;
+  const isFormValid = fullName && email && mobile && isPasswordValid && password === confirmPassword && acceptTerms;
 
   return (
     <div className="min-h-screen bg-[#FCFCFC] dark:bg-[#121212] flex flex-col transition-colors duration-300">
@@ -109,25 +113,67 @@ export default function Register() {
           
           <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF385C]/5 rounded-bl-full shrink-0"></div>
 
+          {/* Header */}
           <div className="text-center space-y-2">
             <span className="inline-flex items-center gap-1 bg-[#FF385C]/10 text-[#FF385C] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              <Sparkles className="w-3 h-3" /> Get Started
+              <Sparkles className="w-3 h-3" /> Quick Join
             </span>
             <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Create your account</h2>
-            <p className="text-xs text-gray-400 dark:text-zinc-500 font-medium">Join Nestfinder to search, book and host unique stays</p>
+            <p className="text-xs text-gray-400 dark:text-zinc-500 font-medium">Search, book & host unique stays instantly</p>
           </div>
 
-          {error && (
+          {/* Success Banner */}
+          {success && (
+            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs p-4 rounded-xl font-bold text-center flex justify-center items-center gap-2 animate-bounce">
+              <CheckCircle className="w-5 h-5 text-emerald-500" />
+              Account created successfully! Logging you in...
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {error && !success && (
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs p-3.5 rounded-xl font-semibold text-center animate-shake">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Account Role Selector (Guest vs Host) */}
+            <div>
+              <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1">
+                I want to:
+              </label>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-zinc-800 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setRole('user')}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    role === 'user'
+                      ? 'bg-white dark:bg-zinc-700 text-[#FF385C] shadow-sm'
+                      : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'
+                  }`}
+                >
+                  <UserCheck className="w-3.5 h-3.5" /> Book Stays
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('host')}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    role === 'host'
+                      ? 'bg-white dark:bg-zinc-700 text-[#FF385C] shadow-sm'
+                      : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'
+                  }`}
+                >
+                  <Building className="w-3.5 h-3.5" /> Become a Host
+                </button>
+              </div>
+            </div>
+
             {/* Full Name */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <User className="w-3 h-3" /> Full Name *
+                <User className="w-3 h-3 text-[#FF385C]" /> Full Name *
               </label>
               <input
                 type="text"
@@ -135,57 +181,44 @@ export default function Register() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Sudheer Sharma"
-                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
               />
             </div>
 
-            {/* Username */}
+            {/* Gmail / Email Address */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <UserCheck className="w-3 h-3" /> Username <span className="text-[9px] text-gray-300 dark:text-zinc-600">(Optional)</span>
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="sudheer79"
-                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
-              />
-            </div>
-
-            {/* Email Address */}
-            <div>
-              <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Mail className="w-3 h-3" /> Email Address <span className="text-[9px] text-gray-300 dark:text-zinc-600">(Optional)</span>
+                <Mail className="w-3 h-3 text-[#FF385C]" /> Email Address *
               </label>
               <input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="sudheer@example.com"
-                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+                placeholder="example@gmail.com"
+                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
               />
             </div>
 
-            {/* Mobile Number */}
+            {/* Phone / Mobile Number */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Phone className="w-3 h-3" /> Mobile Number *
+                <Phone className="w-3 h-3 text-[#FF385C]" /> Mobile Number *
               </label>
               <input
-                type="text"
+                type="tel"
                 required
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
-                placeholder="+919876543210"
-                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+                placeholder="9876543210 or +919876543210"
+                className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
               />
             </div>
 
             {/* Password */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Password *
+                <Lock className="w-3 h-3 text-[#FF385C]" /> Password *
               </label>
               <div className="relative">
                 <input
@@ -193,23 +226,44 @@ export default function Register() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
-                  className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+                  placeholder="••••••••"
+                  className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+
+              {/* Password strength checklist */}
+              {password && (
+                <div className="mt-2 grid grid-cols-2 gap-1 text-[10px] bg-gray-50 dark:bg-zinc-800/60 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800">
+                  <span className={`flex items-center gap-1 ${passwordRules.minLength ? 'text-emerald-600 font-bold' : 'text-gray-400'}`}>
+                    <CheckCircle className="w-3 h-3" /> Min 8 characters
+                  </span>
+                  <span className={`flex items-center gap-1 ${passwordRules.uppercase ? 'text-emerald-600 font-bold' : 'text-gray-400'}`}>
+                    <CheckCircle className="w-3 h-3" /> Uppercase (A-Z)
+                  </span>
+                  <span className={`flex items-center gap-1 ${passwordRules.lowercase ? 'text-emerald-600 font-bold' : 'text-gray-400'}`}>
+                    <CheckCircle className="w-3 h-3" /> Lowercase (a-z)
+                  </span>
+                  <span className={`flex items-center gap-1 ${passwordRules.number ? 'text-emerald-600 font-bold' : 'text-gray-400'}`}>
+                    <CheckCircle className="w-3 h-3" /> Number (0-9)
+                  </span>
+                  <span className={`flex items-center gap-1 col-span-2 ${passwordRules.specialChar ? 'text-emerald-600 font-bold' : 'text-gray-400'}`}>
+                    <CheckCircle className="w-3 h-3" /> Special character (!@#$%^&*)
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password */}
             <div>
               <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Confirm Password *
+                <Lock className="w-3 h-3 text-[#FF385C]" /> Confirm Password *
               </label>
               <div className="relative">
                 <input
@@ -218,104 +272,37 @@ export default function Register() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white"
+                  className="w-full border border-gray-250 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF385C] bg-transparent text-gray-900 dark:text-white pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Password Validation Criteria Box */}
-            {password.length > 0 && (
-              <div className="bg-gray-50 dark:bg-zinc-900/55 p-3.5 rounded-2xl border border-gray-100 dark:border-zinc-800/80 space-y-1.5 text-[11px] font-medium text-gray-500 dark:text-zinc-400">
-                <p className="font-extrabold text-[9px] uppercase tracking-wider mb-1">Password Strength Requirements:</p>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${passwordRules.minLength ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-650'}`}></span>
-                    <span className={passwordRules.minLength ? 'text-emerald-600 dark:text-emerald-400' : ''}>Min 8 characters</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${passwordRules.uppercase ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-650'}`}></span>
-                    <span className={passwordRules.uppercase ? 'text-emerald-600 dark:text-emerald-400' : ''}>One uppercase letter</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${passwordRules.lowercase ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-650'}`}></span>
-                    <span className={passwordRules.lowercase ? 'text-emerald-600 dark:text-emerald-400' : ''}>One lowercase letter</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${passwordRules.number ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-650'}`}></span>
-                    <span className={passwordRules.number ? 'text-emerald-600 dark:text-emerald-400' : ''}>One number</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${passwordRules.specialChar ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-650'}`}></span>
-                    <span className={passwordRules.specialChar ? 'text-emerald-600 dark:text-emerald-400' : ''}>One special char</span>
-                  </div>
-                </div>
-                {password && confirmPassword && (
-                  <p className={`font-bold mt-1 text-[10px] ${password === confirmPassword ? 'text-emerald-500' : 'text-red-500'}`}>
-                    {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Role Select Buttons */}
-            <div>
-              <label className="block text-[10px] font-extrabold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Account Type *</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole('Guest')}
-                  className={`border p-3 rounded-2xl cursor-pointer text-left relative flex flex-col justify-between h-20 transition duration-200 ${
-                    role === 'Guest'
-                      ? 'border-[#FF385C] bg-[#FF385C]/5 text-[#FF385C]'
-                      : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 text-gray-700 dark:text-zinc-400'
-                  }`}
-                >
-                  <span className="text-xs font-bold block">Guest</span>
-                  <span className="text-[10px] text-gray-400 dark:text-zinc-500 leading-none font-medium">Book stays & travel</span>
-                  {role === 'Guest' && <CheckCircle className="w-4 h-4 text-[#FF385C] absolute top-3 right-3" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setRole('Host')}
-                  className={`border p-3 rounded-2xl cursor-pointer text-left relative flex flex-col justify-between h-20 transition duration-200 ${
-                    role === 'Host'
-                      ? 'border-[#FF385C] bg-[#FF385C]/5 text-[#FF385C]'
-                      : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 text-gray-700 dark:text-zinc-400'
-                  }`}
-                >
-                  <span className="text-xs font-bold block">Host</span>
-                  <span className="text-[10px] text-gray-400 dark:text-zinc-500 leading-none font-medium">Rent & host properties</span>
-                  {role === 'Host' && <CheckCircle className="w-4 h-4 text-[#FF385C] absolute top-3 right-3" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Terms and Conditions Checkbox */}
-            <div className="flex items-start gap-2 pt-1.5">
+            {/* Terms checkbox */}
+            <div className="flex items-start gap-2 pt-1">
               <input
                 type="checkbox"
                 id="terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="w-4 h-4 accent-[#FF385C] border border-gray-300 rounded mt-0.5"
+                className="w-4 h-4 accent-[#FF385C] border border-gray-300 rounded mt-0.5 cursor-pointer"
               />
               <label htmlFor="terms" className="text-xs text-gray-500 dark:text-zinc-400 font-medium leading-tight">
-                I accept the <a href="#" className="text-[#FF385C] hover:underline font-bold">Terms & Conditions</a> and consent to security validation.
+                I accept the <a href="#" className="text-[#FF385C] hover:underline font-bold">Terms & Conditions</a> and Privacy Policy.
               </label>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading || !isFormValid}
-              className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3 rounded-xl shadow-md transition hover:scale-101 active:scale-99 cursor-pointer text-sm mt-2 flex justify-center items-center gap-2"
+              className="w-full bg-[#FF385C] hover:bg-[#E61E4D] disabled:opacity-50 text-white font-extrabold py-3.5 rounded-xl shadow-md transition hover:scale-[1.01] active:scale-[0.99] cursor-pointer text-sm mt-3 flex justify-center items-center gap-2"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -323,7 +310,7 @@ export default function Register() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Registering...
+                  Creating Account...
                 </div>
               ) : (
                 'Create Account'
@@ -331,7 +318,7 @@ export default function Register() {
             </button>
           </form>
 
-          <div className="text-center text-xs text-gray-500 dark:text-zinc-500 pt-2 border-t border-gray-50 dark:border-zinc-800">
+          <div className="text-center text-xs text-gray-500 dark:text-zinc-500 pt-3 border-t border-gray-100 dark:border-zinc-800">
             Already have an account?{' '}
             <Link to="/login" className="text-[#FF385C] hover:underline font-bold">
               Log in

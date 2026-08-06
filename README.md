@@ -7,7 +7,7 @@ Nestfinder is a premium-grade stay-booking web application built using the MERN 
 ## ✨ Features Checklist
 
 ### 👤 Guest/User side
-* **JWT Authentication**: Secure register, login, logout, and token authorization.
+* **1-Click Authentication**: Streamlined, instant registration and login using Full Name, Email Address, Mobile Number, and Password (No OTP barriers).
 * **Modern stays header search**: Floating pill search filter (Destination City, Price Range, Guest capacity, and Star ratings).
 * **Category Filters**: Quick-tabs (Beachfront, Cabins, Penthouses, Heritage, Houseboats) to filter stays.
 * **Interactive Image Galleries**: High-end details page with 5-photo grid layout.

@@ -126,13 +126,24 @@ export default function VerifySignupOTP() {
 
     setLoading(true);
     try {
-      // Step 1: Verify OTP codes
+      let firebaseVerified = false;
+      if (window.confirmationResult) {
+        try {
+          await window.confirmationResult.confirm(mobileOtp);
+          firebaseVerified = true;
+        } catch (fbErr) {
+          console.warn('[Firebase Verify] Firebase OTP confirmation failed, falling back to backend:', fbErr.message);
+        }
+      }
+
+      // Always mark verified in backend MongoDB session
       await api.post('/auth/verify-signup-otp', {
         mobile,
-        mobileOtp
+        mobileOtp,
+        firebaseVerified
       });
 
-      // Step 2: Proceed with account creation (signup) and auto login
+      // Proceed with account creation (signup) and auto login
       await signupOTP({
         ...signupData
       });
@@ -144,6 +155,8 @@ export default function VerifySignupOTP() {
       setLoading(false);
     }
   };
+
+
 
   const handleResendOTP = async () => {
     if (!canResend) return;
